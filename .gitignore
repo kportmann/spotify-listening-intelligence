@@ -54,3 +54,6 @@ docker-compose.override.yml
 
 # Other
 .DS_Store
+
+# Data
+data/
