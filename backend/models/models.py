@@ -1,7 +1,6 @@
 from pydantic import BaseModel, field_validator
 from datetime import datetime
 from typing import Optional
-import ipaddress
 
 
 class SpotifyStreamRecord(BaseModel):
@@ -28,31 +27,9 @@ class SpotifyStreamRecord(BaseModel):
     shuffle: bool
     skipped: bool
     offline: bool
-    offline_timestamp: int
+    offline_timestamp: Optional[int] = None
     incognito_mode: bool
 
-    @field_validator('ts', pre=True)
-    def parse_timestamp(cls, v):
-        """Convert ISO timestamp string to datetime object."""
-        if isinstance(v, str):
-            return datetime.fromisoformat(v.replace('Z', '+00:00'))
-        return v
-
-    @field_validator('ip_addr')
-    def validate_ip(cls, v):
-        """Validate IP address format."""
-        try:
-            ipaddress.ip_address(v)
-            return v
-        except ValueError:
-            raise ValueError(f"Invalid IP address: {v}")
-
-    @field_validator('conn_country')
-    def validate_country_code(cls, v):
-        """Validate country code is 2 characters."""
-        if len(v) != 2:
-            raise ValueError(f"Country code must be 2 characters: {v}")
-        return v.upper()
 
     @property
     def is_track(self) -> bool:
@@ -87,7 +64,7 @@ class TrackRecord(BaseModel):
     @field_validator('spotify_uri')
     def validate_spotify_uri(cls, v):
         """Validate Spotify URI format."""
-        if not v.startswith('spotify:track:'):
+        if v and not v.startswith('spotify:track:'):
             raise ValueError(f"Invalid Spotify track URI: {v}")
         return v
 
@@ -102,7 +79,7 @@ class EpisodeRecord(BaseModel):
     @field_validator('spotify_uri')
     def validate_spotify_uri(cls, v):
         """Validate Spotify episode URI format."""
-        if not v.startswith('spotify:episode:'):
+        if v and not v.startswith('spotify:episode:'):
             raise ValueError(f"Invalid Spotify episode URI: {v}")
         return v
 
@@ -118,6 +95,6 @@ class AudiobookChapterRecord(BaseModel):
     @field_validator('chapter_uri')
     def validate_chapter_uri(cls, v):
         """Validate audiobook chapter URI format."""
-        if not v.startswith('spotify:'):
+        if v and not v.startswith('spotify:'):
             raise ValueError(f"Invalid audiobook chapter URI: {v}")
         return v

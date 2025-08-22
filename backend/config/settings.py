@@ -1,11 +1,12 @@
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
 from pathlib import Path
+import os
 
 class DatabaseSettings(BaseSettings):
     """Database configuration settings."""
     
-    host: str = "db"
+    host: str = "localhost"
     port: int = 5432
     user: str
     password: str
@@ -29,14 +30,15 @@ class DatabaseSettings(BaseSettings):
 
     model_config = {
         "env_file": ".env",
-        "env_prefix": "POSTGRES_"
+        "env_prefix": "POSTGRES_",
+        "extra": "ignore"
     }
 
 
 class ETLSettings(BaseSettings):
     """ETL pipeline configuration settings."""
     
-    data_directory: str = "../data"
+    data_directory: str = str(Path(__file__).parent.parent.parent / "data")
     batch_size: int = 1000
     log_level: str = "INFO"
     max_retries: int = 3
@@ -60,7 +62,8 @@ class ETLSettings(BaseSettings):
 
     model_config = {
         "env_file": ".env",
-        "env_prefix": "ETL_"
+        "env_prefix": "ETL_",
+        "extra": "ignore"
     }
 
 
@@ -82,7 +85,8 @@ class Settings(BaseSettings):
 
     model_config = {
         "env_file": ".env",
-        "case_sensitive": False
+        "case_sensitive": False,
+        "extra": "ignore"
     }
 
 
