@@ -1,24 +1,41 @@
+import React, { useState } from 'react';
 import './Sidebar.css';
 
 function Sidebar() {
+  const [isOpen, setIsOpen] = useState(false);
+  
   const menuItems = [
     { label: 'Dashboard', active: true },
     { label: 'example', active: false}
   ];
 
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <div className="sidebar">
-      <nav className="nav-menu">
-        {menuItems.map((item, index) => (
-          <div 
-            key={index} 
-            className={`nav-item ${item.active ? 'active' : ''}`}
-          >
-            {item.label}
-          </div>
-        ))}
-      </nav>
-    </div>
+    <>
+      <button 
+        className="sidebar-toggle" 
+        onClick={toggleSidebar}
+        aria-label="Toggle sidebar"
+      >
+        ☰
+      </button>
+      <div className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
+        <nav className="nav-menu">
+          {menuItems.map((item, index) => (
+            <div 
+              key={index} 
+              className={`nav-item ${item.active ? 'active' : ''}`}
+            >
+              {item.label}
+            </div>
+          ))}
+        </nav>
+      </div>
+      {isOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
+    </>
   );
 }
 

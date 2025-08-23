@@ -14,7 +14,7 @@
 
 @media (max-width: 768px) {
   .main-container {
-    margin-left: 0;
+    margin-left: 8px;
     margin-top: 96px;
     margin-right: 8px;
     margin-bottom: 76px;

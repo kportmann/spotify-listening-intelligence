@@ -49,4 +49,9 @@ body {
     grid-template-columns: 1fr;
     gap: 16px;
   }
+  
+  .dashboard-content {
+    padding: 20px;
+    margin: 0;
+  }
 }
