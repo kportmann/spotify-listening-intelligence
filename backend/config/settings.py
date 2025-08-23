@@ -6,7 +6,7 @@ import os
 class DatabaseSettings(BaseSettings):
     """Database configuration settings."""
     
-    host: str = "localhost"
+    host: str = "db"
     port: int = 5432
     user: str
     password: str
@@ -29,7 +29,7 @@ class DatabaseSettings(BaseSettings):
         }
 
     model_config = {
-        "env_file": ".env",
+        "env_file": "../.env",
         "env_prefix": "POSTGRES_",
         "extra": "ignore"
     }
@@ -44,14 +44,6 @@ class ETLSettings(BaseSettings):
     max_retries: int = 3
     retry_delay: int = 5
     
-    @field_validator('data_directory')
-    def validate_data_directory(cls, v):
-        """Ensure data directory exists."""
-        path = Path(v)
-        if not path.exists():
-            raise ValueError(f"Data directory does not exist: {v}")
-        return str(path.resolve())
-    
     @field_validator('log_level')
     def validate_log_level(cls, v):
         """Validate log level."""
@@ -61,7 +53,7 @@ class ETLSettings(BaseSettings):
         return v.upper()
 
     model_config = {
-        "env_file": ".env",
+        "env_file": "../.env",
         "env_prefix": "ETL_",
         "extra": "ignore"
     }
@@ -84,7 +76,7 @@ class Settings(BaseSettings):
         return v.lower()
 
     model_config = {
-        "env_file": ".env",
+        "env_file": "../.env",
         "case_sensitive": False,
         "extra": "ignore"
     }

@@ -5,7 +5,7 @@ function Header() {
     <header className="header">
       <div className="header-left">
         <img src="/images/logos/Spotify_Full_Logo_RGB_White.png" alt="Spotify" className="header-logo" />
-        <span className="header-title">Streaming Analytics</span>
+        <span className="header-title">| Streaming Analytics</span>
       </div>
       
       <div className="header-right">
@@ -13,7 +13,7 @@ function Header() {
           <div className="user-avatar">
             <span>K</span>
           </div>
-          <span className="user-name">user name</span>
+          <span className="user-name">user</span>
         </div>
       </div>
     </header>

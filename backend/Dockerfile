@@ -14,3 +14,9 @@ WORKDIR /app
 # This leverages Docker's layer caching
 COPY pyproject.toml ./
 RUN uv pip install --system -r pyproject.toml
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 8000
