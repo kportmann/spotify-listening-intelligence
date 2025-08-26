@@ -7,7 +7,7 @@ export function useAnalytics() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    analyticsService.getOverviewStats()
+    analyticsService.get_total_listening_time()
       .then(setStats)
       .catch(setError)
       .finally(() => setLoading(false));

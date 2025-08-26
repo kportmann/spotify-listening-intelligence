@@ -9,19 +9,9 @@ export default function StatsGrid({ stats }) {
   return (
     <div className="stats-grid">
       <StatCard 
-        title="Total Streams" 
-        value={stats.total_streams.toLocaleString()} 
-        subtitle="Music tracks played"
-      />
-      <StatCard 
-        title="Listening Time" 
-        value={`${stats.total_listening_hours}h`} 
-        subtitle="Total hours"
-      />
-      <StatCard 
-        title="Unique Artists" 
-        value={stats.unique_artists.toLocaleString()} 
-        subtitle="Different artists"
+        title="Total Streaming Hours" 
+        value={stats.total_hours.toLocaleString()} 
+        subtitle="Hours listened"
       />
     </div>
   );
