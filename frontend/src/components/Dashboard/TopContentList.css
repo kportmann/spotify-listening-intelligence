@@ -130,6 +130,12 @@
   color: #ef4444;
 }
 
+.loading-indicator {
+  font-size: 0.8rem;
+  color: #1db954;
+  font-weight: 400;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .top-content-card {

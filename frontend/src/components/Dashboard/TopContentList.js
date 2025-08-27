@@ -1,6 +1,14 @@
 import './TopContentList.css';
 
-export default function TopContentList({ title, items, loading, error, type = 'default' }) {
+export default function TopContentList({ 
+  title, 
+  items, 
+  loading, 
+  error, 
+  type = 'default', 
+  visibleCount = null,
+  loadingImages = false 
+}) {
   if (loading) {
     return (
       <div className="top-content-card">
@@ -108,11 +116,19 @@ export default function TopContentList({ title, items, loading, error, type = 'd
     }
   };
 
+  // Determine which items to show
+  const displayItems = visibleCount ? items?.slice(0, visibleCount) : items;
+
   return (
     <div className="top-content-card">
-      <h3>{title}</h3>
+      <h3>
+        {title}
+        {loadingImages && (
+          <span className="loading-indicator"> (Loading images...)</span>
+        )}
+      </h3>
       <div className="top-content-list">
-        {items.map(renderItem)}
+        {displayItems?.map(renderItem)}
       </div>
     </div>
   );
