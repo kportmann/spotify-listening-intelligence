@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { analyticsService } from '../services/analyticsService';
+import { basicStatsService } from '../services/basicStatsService';
 
 export function useAnalytics() {
   const [stats, setStats] = useState(null);
@@ -7,7 +7,7 @@ export function useAnalytics() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    analyticsService.getStatsOverview()
+    basicStatsService.getStatsOverview()
       .then(setStats)
       .catch(setError)
       .finally(() => setLoading(false));
