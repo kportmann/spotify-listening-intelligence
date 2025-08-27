@@ -4,7 +4,7 @@ from sqlalchemy import func, desc
 from database.connection import get_db
 from database.schema import SpotifyStream
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 router = APIRouter()
 
@@ -214,7 +214,7 @@ async def get_top_audiobooks(
 
 def _get_cutoff_date(period: str) -> Optional[datetime]:
     """Helper function to calculate cutoff date based on period"""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     
     period_mapping = {
         "7d": timedelta(days=7),
