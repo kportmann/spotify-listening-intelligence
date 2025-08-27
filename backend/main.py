@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config.settings import get_settings
-from routers import analytics
+from routers import basicStatsAnalytics
 
 settings = get_settings()
 
@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"])
+app.include_router(basicStatsAnalytics.router, prefix="/api/v1/analytics", tags=["analytics"])
 
 @app.get("/")
 async def root():
