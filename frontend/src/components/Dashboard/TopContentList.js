@@ -34,6 +34,11 @@ export default function TopContentList({ title, items, loading, error, type = 'd
         return (
           <div key={index} className="top-content-item">
             <span className="rank">#{index + 1}</span>
+            {item.image_url && (
+              <div className="artist-image">
+                <img src={item.image_url} alt={item.artist_name} />
+              </div>
+            )}
             <div className="content-info">
               <div className="primary-text">{item.artist_name}</div>
               <div className="secondary-text">{item.total_hours}h • {item.play_count} plays</div>
@@ -45,6 +50,11 @@ export default function TopContentList({ title, items, loading, error, type = 'd
         return (
           <div key={index} className="top-content-item">
             <span className="rank">#{index + 1}</span>
+            {item.image_url && (
+              <div className="track-image">
+                <img src={item.image_url} alt={`${item.track_name} by ${item.artist_name}`} />
+              </div>
+            )}
             <div className="content-info">
               <div className="primary-text">{item.track_name}</div>
               <div className="secondary-text">{item.artist_name} • {item.total_hours}h</div>

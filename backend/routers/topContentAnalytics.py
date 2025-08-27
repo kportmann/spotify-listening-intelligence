@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 from database.connection import get_db
 from database.schema import SpotifyStream
+from services.spotify_service import spotify_service
 from typing import Optional
 from datetime import datetime, timedelta, timezone
 
@@ -37,15 +38,32 @@ async def get_top_artists(
         desc('total_ms')
     ).limit(limit).all()
     
-    return [
-        {
+    # Enrich with Spotify artist images
+    enriched_results = []
+    for result in results:
+        artist_data = {
             "artist_name": result.artist_name,
             "total_ms": result.total_ms,
             "total_hours": round(result.total_ms / (1000 * 60 * 60), 1),
-            "play_count": result.play_count
+            "play_count": result.play_count,
+            "image_url": None
         }
-        for result in results
-    ]
+        
+        # Try to get artist image from Spotify API
+        try:
+            spotify_artist = await spotify_service.search_artist(result.artist_name)
+            if spotify_artist and spotify_artist.images:
+                # Get medium size image (usually index 1) or first available
+                image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
+                artist_data["image_url"] = image_url
+        except Exception as e:
+            # Continue without image if Spotify API fails
+            print(f"Failed to fetch image for artist {result.artist_name}: {e}")
+            pass
+        
+        enriched_results.append(artist_data)
+    
+    return enriched_results
 
 @router.get("/top/tracks")
 async def get_top_tracks(
@@ -80,17 +98,34 @@ async def get_top_tracks(
         desc('total_ms')
     ).limit(limit).all()
     
-    return [
-        {
+    # Enrich with Spotify track album artwork
+    enriched_results = []
+    for result in results:
+        track_data = {
             "track_name": result.track_name,
             "artist_name": result.artist_name,
             "album_name": result.album_name,
             "total_ms": result.total_ms,
             "total_hours": round(result.total_ms / (1000 * 60 * 60), 1),
-            "play_count": result.play_count
+            "play_count": result.play_count,
+            "image_url": None
         }
-        for result in results
-    ]
+        
+        # Try to get track album artwork from Spotify API
+        try:
+            spotify_track = await spotify_service.search_track(result.track_name, result.artist_name)
+            if spotify_track and spotify_track.album_images:
+                # Get medium size image (usually index 1) or first available
+                image_url = spotify_track.album_images[1].url if len(spotify_track.album_images) > 1 else spotify_track.album_images[0].url
+                track_data["image_url"] = image_url
+        except Exception as e:
+            # Continue without image if Spotify API fails
+            print(f"Failed to fetch image for track {result.track_name} by {result.artist_name}: {e}")
+            pass
+        
+        enriched_results.append(track_data)
+    
+    return enriched_results
 
 @router.get("/top/episodes")
 async def get_top_episodes(

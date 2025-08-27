@@ -21,6 +21,14 @@ class SpotifyArtist(BaseModel):
     popularity: int
 
 
+class SpotifyTrack(BaseModel):
+    id: str
+    name: str
+    artists: List[str]
+    album_name: str
+    album_images: List[SpotifyImage]
+
+
 class SpotifyService:
     def __init__(self):
         settings = get_settings()
@@ -114,6 +122,44 @@ class SpotifyService:
                 followers=artist["followers"]["total"],
                 genres=artist["genres"],
                 popularity=artist["popularity"]
+            )
+    
+    async def search_track(self, track_name: str, artist_name: str) -> Optional[SpotifyTrack]:
+        """Search for track and return track data with album artwork"""
+        access_token = await self.get_client_credentials_token()
+        
+        headers = {"Authorization": f"Bearer {access_token}"}
+        # Search for both track and artist for better accuracy
+        query = f"track:{track_name} artist:{artist_name}"
+        params = {
+            "q": query,
+            "type": "track",
+            "limit": 1
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/search", 
+                headers=headers, 
+                params=params
+            )
+            
+            if response.status_code != 200:
+                return None
+            
+            data = response.json()
+            tracks = data.get("tracks", {}).get("items", [])
+            
+            if not tracks:
+                return None
+            
+            track = tracks[0]
+            return SpotifyTrack(
+                id=track["id"],
+                name=track["name"],
+                artists=[artist["name"] for artist in track["artists"]],
+                album_name=track["album"]["name"],
+                album_images=[SpotifyImage(**img) for img in track["album"]["images"]]
             )
 
 
