@@ -1,30 +1,55 @@
 .top-content-card {
-  background: white;
-  border-radius: 8px;
+  background: #303030;
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333333;
   margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.top-content-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1db954 0%, #1ed760 100%);
+}
+
+.top-content-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(29, 185, 84, 0.25);
+  border-color: #1db954;
 }
 
 .top-content-card h3 {
-  margin: 0 0 1rem 0;
-  color: #333;
-  font-size: 1.2rem;
+  margin: 0 0 1.25rem 0;
+  color: #ffffff;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
 .top-content-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .top-content-item {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 0.75rem 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.top-content-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .top-content-item:last-child {
@@ -33,9 +58,10 @@
 
 .rank {
   font-weight: 600;
-  color: #666;
-  min-width: 2rem;
-  text-align: right;
+  color: #1db954;
+  min-width: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 .content-info {
@@ -44,25 +70,26 @@
 
 .primary-text {
   font-weight: 500;
-  color: #333;
+  color: #ffffff;
   margin-bottom: 0.25rem;
   line-height: 1.4;
+  font-size: 0.95rem;
 }
 
 .secondary-text {
-  font-size: 0.875rem;
-  color: #666;
+  font-size: 0.8rem;
+  color: #a1a1a1;
   line-height: 1.3;
 }
 
 .loading, .error, .no-data {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: #a1a1a1;
 }
 
 .error {
-  color: #d32f2f;
+  color: #ef4444;
 }
 
 /* Responsive design */

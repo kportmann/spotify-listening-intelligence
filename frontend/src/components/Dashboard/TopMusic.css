@@ -1,8 +1,8 @@
-.top-content-section {
-  margin-top: 3rem;
+.top-music-section {
+  margin-bottom: 3rem;
 }
 
-.top-content-header {
+.top-music-header {
   font-size: 1.75rem;
   font-weight: 600;
   color: #ffffff;
@@ -11,7 +11,7 @@
   position: relative;
 }
 
-.top-content-header::after {
+.top-music-header::after {
   content: '';
   position: absolute;
   bottom: -0.5rem;
@@ -23,15 +23,16 @@
   border-radius: 2px;
 }
 
-.top-content-grid {
+.top-music-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
 }
 
-.top-content-loading, .top-content-error {
+.top-music-loading,
+.top-music-error {
   text-align: center;
-  padding: 2rem;
+  padding: 3rem 2rem;
   color: #a1a1a1;
   background: #303030;
   border-radius: 12px;
@@ -39,23 +40,28 @@
   border: 1px solid #333333;
 }
 
-.top-content-error {
+.top-music-error {
   color: #ef4444;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .top-content-section {
-    margin-top: 2rem;
+  .top-music-section {
+    margin-bottom: 2rem;
   }
   
-  .top-content-header {
+  .top-music-header {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
   }
   
-  .top-content-grid {
+  .top-music-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.5rem;
+  }
+  
+  .top-music-loading,
+  .top-music-error {
+    padding: 2rem 1rem;
   }
 }

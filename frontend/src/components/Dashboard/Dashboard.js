@@ -1,5 +1,7 @@
 import { useAnalytics } from '../../hooks/useAnalytics';
+import HeroStats from './HeroStats';
 import StatsGrid from './StatsGrid';
+import TopMusic from './TopMusic';
 import TopContent from './TopContent';
 
 export default function Dashboard() {
@@ -15,7 +17,12 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
+      <HeroStats stats={stats} />
+      
       <StatsGrid stats={stats} />
+      
+      <TopMusic period="all_time" limit={5} />
+      
       <TopContent period="all_time" limit={5} />
     </div>
   );

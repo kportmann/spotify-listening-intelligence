@@ -6,7 +6,8 @@ function Sidebar() {
   
   const menuItems = [
     { label: 'Dashboard', active: true },
-    { label: 'example', active: false}
+    { label: 'Example1', active: false },
+    { label: 'Example2', active: false },
   ];
 
   const toggleSidebar = () => {

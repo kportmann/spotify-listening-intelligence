@@ -1,11 +1,11 @@
 .stat-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: #303030;
   padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
-  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  text-align: left;
   min-width: 220px;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid #333333;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -22,34 +22,32 @@
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(29, 185, 84, 0.25);
+  border-color: #1db954;
 }
 
 .stat-title {
-  color: #64748b;
-  font-size: 13px;
-  font-weight: 600;
-  margin: 0 0 12px 0;
+  color: #a1a1a1;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
 }
 
 .stat-value {
-  color: #1e293b;
-  font-size: 36px;
+  color: #ffffff;
+  font-size: 32px;
   font-weight: 700;
-  margin: 8px 0 12px 0;
+  margin: 4px 0 8px 0;
   line-height: 1.1;
-  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .stat-subtitle {
-  color: #94a3b8;
+  color: #a1a1a1;
   font-size: 12px;
   margin: 0;
-  font-weight: 500;
+  font-weight: 400;
+  opacity: 0.8;
 }
