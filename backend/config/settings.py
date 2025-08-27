@@ -59,11 +59,26 @@ class ETLSettings(BaseSettings):
     }
 
 
+class SpotifySettings(BaseSettings):
+    """Spotify API configuration settings."""
+    
+    client_id: str
+    client_secret: str
+    redirect_uri: str = "http://127.0.0.1:3000/callback"
+    
+    model_config = {
+        "env_file": "../.env",
+        "env_prefix": "SPOTIFY_",
+        "extra": "ignore"
+    }
+
+
 class Settings(BaseSettings):
     """Main application settings."""
     
     database: DatabaseSettings = DatabaseSettings()
     etl: ETLSettings = ETLSettings()
+    spotify: SpotifySettings = SpotifySettings()
     environment: str = "development"
     debug: bool = False
     
