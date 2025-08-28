@@ -24,12 +24,14 @@ export default function TopContentCarousel({ items, type, title }) {
     setCurrentIndex((prev) => (prev - 1 + featuredItems.length) % featuredItems.length);
   };
 
-  const renderCarouselItem = (item) => {
+  const renderCarouselItem = (item, itemIndex, isMain = true) => {
+    const cardClass = isMain ? 'carousel-card carousel-card-main' : 'carousel-card carousel-card-teaser';
+    
     switch (type) {
       case 'artists':
         return (
-          <div className="carousel-card">
-            <div className="carousel-rank">#{currentIndex + 1}</div>
+          <div className={cardClass}>
+            {isMain && <div className="carousel-rank">#{itemIndex + 1}</div>}
             {item.image_url && (
               <div className="carousel-image-container">
                 <img 
@@ -41,17 +43,37 @@ export default function TopContentCarousel({ items, type, title }) {
             )}
             <div className="carousel-content">
               <h4 className="carousel-primary-text">{item.artist_name}</h4>
-              <p className="carousel-secondary-text">
-                {item.total_hours}h • {item.play_count} plays
-              </p>
+              {isMain && (
+                <p className="carousel-secondary-text">
+                  {item.total_hours}h • {item.play_count} plays
+                </p>
+              )}
             </div>
+            {isMain && (
+              <div className="carousel-nav-buttons">
+                <button 
+                  className="carousel-nav-btn carousel-nav-prev"
+                  onClick={prevItem}
+                  aria-label="Previous"
+                >
+                  ◀
+                </button>
+                <button 
+                  className="carousel-nav-btn carousel-nav-next"
+                  onClick={nextItem}
+                  aria-label="Next"
+                >
+                  ▶
+                </button>
+              </div>
+            )}
           </div>
         );
       
       case 'tracks':
         return (
-          <div className="carousel-card">
-            <div className="carousel-rank">#{currentIndex + 1}</div>
+          <div className={cardClass}>
+            {isMain && <div className="carousel-rank">#{itemIndex + 1}</div>}
             {item.image_url && (
               <div className="carousel-image-container">
                 <img 
@@ -63,21 +85,59 @@ export default function TopContentCarousel({ items, type, title }) {
             )}
             <div className="carousel-content">
               <h4 className="carousel-primary-text">{item.track_name}</h4>
-              <p className="carousel-secondary-text">
-                {item.artist_name} • {item.total_hours}h
-              </p>
+              {isMain && (
+                <p className="carousel-secondary-text">
+                  {item.artist_name} • {item.total_hours}h
+                </p>
+              )}
             </div>
+            {isMain && (
+              <div className="carousel-nav-buttons">
+                <button 
+                  className="carousel-nav-btn carousel-nav-prev"
+                  onClick={prevItem}
+                  aria-label="Previous"
+                >
+                  ◀
+                </button>
+                <button 
+                  className="carousel-nav-btn carousel-nav-next"
+                  onClick={nextItem}
+                  aria-label="Next"
+                >
+                  ▶
+                </button>
+              </div>
+            )}
           </div>
         );
       
       default:
         return (
-          <div className="carousel-card">
-            <div className="carousel-rank">#{currentIndex + 1}</div>
+          <div className={cardClass}>
+            {isMain && <div className="carousel-rank">#{itemIndex + 1}</div>}
             <div className="carousel-content">
               <h4 className="carousel-primary-text">{item.name || 'Unknown'}</h4>
-              <p className="carousel-secondary-text">{item.total_hours}h</p>
+              {isMain && <p className="carousel-secondary-text">{item.total_hours}h</p>}
             </div>
+            {isMain && (
+              <div className="carousel-nav-buttons">
+                <button 
+                  className="carousel-nav-btn carousel-nav-prev"
+                  onClick={prevItem}
+                  aria-label="Previous"
+                >
+                  ◀
+                </button>
+                <button 
+                  className="carousel-nav-btn carousel-nav-next"
+                  onClick={nextItem}
+                  aria-label="Next"
+                >
+                  ▶
+                </button>
+              </div>
+            )}
           </div>
         );
     }
@@ -88,29 +148,31 @@ export default function TopContentCarousel({ items, type, title }) {
       <h3 className="carousel-title">{title}</h3>
       
       <div className="carousel-wrapper">
-        {featuredItems.length > 1 && (
-          <button 
-            className="carousel-nav carousel-nav-left"
-            onClick={prevItem}
-            aria-label="Previous item"
-          >
-            ←
-          </button>
-        )}
-        
         <div className="carousel-content-area">
-          {renderCarouselItem(currentItem)}
+          {featuredItems.length > 1 && (
+            <div className="carousel-teaser-left">
+              {renderCarouselItem(
+                featuredItems[(currentIndex - 1 + featuredItems.length) % featuredItems.length],
+                (currentIndex - 1 + featuredItems.length) % featuredItems.length,
+                false
+              )}
+            </div>
+          )}
+          
+          <div className="carousel-main">
+            {renderCarouselItem(currentItem, currentIndex, true)}
+          </div>
+          
+          {featuredItems.length > 1 && (
+            <div className="carousel-teaser-right">
+              {renderCarouselItem(
+                featuredItems[(currentIndex + 1) % featuredItems.length],
+                (currentIndex + 1) % featuredItems.length,
+                false
+              )}
+            </div>
+          )}
         </div>
-        
-        {featuredItems.length > 1 && (
-          <button 
-            className="carousel-nav carousel-nav-right"
-            onClick={nextItem}
-            aria-label="Next item"
-          >
-            →
-          </button>
-        )}
       </div>
       
       {featuredItems.length > 1 && (

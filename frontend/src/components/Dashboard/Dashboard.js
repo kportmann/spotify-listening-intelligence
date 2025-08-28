@@ -21,7 +21,7 @@ export default function Dashboard() {
       
       <StatsGrid stats={stats} />
       
-      <TopMusic period="all_time" limit={10} />
+      <TopMusic period="all_time" limit={100} />
       
       <TopContent period="all_time" limit={5} />
     </div>
