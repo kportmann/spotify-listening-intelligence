@@ -14,7 +14,7 @@ export default function StatsGrid({ stats, period = 'all_time' }) {
 
   return (
     <div className="stats-section">
-      <h2 className="stats-header">Music Quick Stats {period !== 'all_time' ? `- ${getPeriodLabel(period)}` : ''}</h2>
+      <h2 className="stats-header">Quick Stats - Music</h2>
       <div className="stats-grid">
         <StatCard 
           title="Music Hours" 
@@ -36,7 +36,7 @@ export default function StatsGrid({ stats, period = 'all_time' }) {
         
         <StatCard 
           title="Daily Average" 
-          value={`${Math.round(stats.music.listening_time.hours / stats.time_period.streaming_days)} hrs`} 
+          value={`${Math.round((stats.music.listening_time.hours / stats.time_period.streaming_days) * 60)} min`} 
           subtitle={`Based on ${stats.time_period.streaming_days} days`}
         />
       </div>
