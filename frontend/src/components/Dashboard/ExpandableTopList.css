@@ -1,0 +1,148 @@
+.expandable-list-container {
+  margin-top: 2rem;
+}
+
+.expandable-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.expandable-list-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.limit-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.limit-selector-label {
+  color: #a1a1a1;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.limit-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.limit-button {
+  background: #333333;
+  color: #ffffff;
+  border: 1px solid #444444;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.limit-button:hover {
+  background: #444444;
+  border-color: #555555;
+}
+
+.limit-button.active {
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  border-color: #1db954;
+  color: white;
+  box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
+}
+
+.limit-button.active:hover {
+  background: linear-gradient(135deg, #1ed760 0%, #21e065 100%);
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
+}
+
+.expandable-list-content {
+  background: #303030;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333333;
+}
+
+.expandable-list-loading,
+.expandable-list-error,
+.expandable-list-no-data {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #a1a1a1;
+  background: #303030;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333333;
+}
+
+.expandable-list-error {
+  color: #ef4444;
+}
+
+.expandable-list-footer {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.items-count {
+  color: #a1a1a1;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Override TopContentList styles when used inside expandable list */
+.expandable-list-content .top-content-card {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+}
+
+.expandable-list-content .top-content-card h3 {
+  display: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .expandable-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .limit-selector {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .limit-buttons {
+    flex: 1;
+    justify-content: flex-end;
+  }
+  
+  .expandable-list-content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .limit-buttons {
+    gap: 0.25rem;
+  }
+  
+  .limit-button {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}

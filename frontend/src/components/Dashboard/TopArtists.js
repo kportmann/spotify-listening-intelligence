@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useTopContent } from '../../hooks/useTopContent';
 import { topContentService } from '../../services/topContentService';
-import TopContentList from './TopContentList';
+import TopContentCarousel from './TopContentCarousel';
+import ExpandableTopList from './ExpandableTopList';
 import './TopArtists.css';
 
-export default function TopArtists({ period = 'all_time', limit = 5 }) {
+export default function TopArtists({ period = 'all_time', limit = 100 }) {
   const { data, loading, error } = useTopContent(period, limit);
   const [itemsWithImages, setItemsWithImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(3);
+  const [showExpanded, setShowExpanded] = useState(false);
 
   // Load images for artists
   useEffect(() => {
@@ -18,7 +19,9 @@ export default function TopArtists({ period = 'all_time', limit = 5 }) {
       setLoadingImages(true);
       
       try {
-        const artistsToLoad = data.artists.slice(0, visibleCount).map(a => a.artist_name);
+        // Load images for more items when expanded, otherwise just top 10
+        const itemsToLoad = showExpanded ? 40 : 10;
+        const artistsToLoad = data.artists.slice(0, itemsToLoad).map(a => a.artist_name);
         const imageData = await topContentService.getImagesForContent(artistsToLoad, []);
         
         const updatedArtists = data.artists.map(artist => ({
@@ -35,20 +38,12 @@ export default function TopArtists({ period = 'all_time', limit = 5 }) {
     };
 
     loadImagesForArtists();
-  }, [data, visibleCount]);
+  }, [data, showExpanded]);
 
-  const showMore = () => {
-    if (data?.artists) {
-      setVisibleCount(Math.min(visibleCount + 10, data.artists.length));
-    }
+  const toggleExpanded = () => {
+    setShowExpanded(!showExpanded);
   };
 
-  const showLess = () => {
-    setVisibleCount(3);
-  };
-
-  const canShowMore = data?.artists && visibleCount < data.artists.length;
-  const canShowLess = visibleCount > 3;
   const hasImages = itemsWithImages.length > 0;
 
   if (loading) {
@@ -72,37 +67,42 @@ export default function TopArtists({ period = 'all_time', limit = 5 }) {
 
   return (
     <div className="top-artists-section">
-      <TopContentList 
-        title="Top Artists" 
-        items={displayData} 
-        type="artists"
-        loading={false}
-        error={null}
-        visibleCount={visibleCount}
-        loadingImages={loadingImages}
-      />
-      
-      {(canShowMore || canShowLess) && (
-        <div className="show-more-section">
-          {canShowMore && (
+      {!showExpanded ? (
+        <>
+          <TopContentCarousel 
+            items={displayData}
+            type="artists"
+            title="Top Artists"
+          />
+          
+          <div className="carousel-actions">
             <button 
-              onClick={showMore} 
+              onClick={toggleExpanded}
               className="show-more-btn"
               disabled={loadingImages}
             >
-              {loadingImages ? 'Loading images...' : 'Show More'}
+              {loadingImages ? 'Loading...' : 'Show More'}
             </button>
-          )}
-          {canShowLess && (
+          </div>
+        </>
+      ) : (
+        <>
+          <ExpandableTopList
+            items={displayData}
+            type="artists"
+            title="All Top Artists"
+            loadingImages={loadingImages}
+          />
+          
+          <div className="carousel-actions">
             <button 
-              onClick={showLess} 
+              onClick={toggleExpanded}
               className="show-less-btn"
-              disabled={loadingImages}
             >
               Show Less
             </button>
-          )}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

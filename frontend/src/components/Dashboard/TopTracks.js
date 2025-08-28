@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useTopContent } from '../../hooks/useTopContent';
 import { topContentService } from '../../services/topContentService';
-import TopContentList from './TopContentList';
+import TopContentCarousel from './TopContentCarousel';
+import ExpandableTopList from './ExpandableTopList';
 import './TopTracks.css';
 
-export default function TopTracks({ period = 'all_time', limit = 5 }) {
+export default function TopTracks({ period = 'all_time', limit = 100 }) {
   const { data, loading, error } = useTopContent(period, limit);
   const [itemsWithImages, setItemsWithImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(3);
+  const [showExpanded, setShowExpanded] = useState(false);
 
   // Load images for tracks
   useEffect(() => {
@@ -18,7 +19,9 @@ export default function TopTracks({ period = 'all_time', limit = 5 }) {
       setLoadingImages(true);
       
       try {
-        const tracksToLoad = data.tracks.slice(0, visibleCount);
+        // Load images for more items when expanded, otherwise just top 10
+        const itemsToLoad = showExpanded ? 40 : 10;
+        const tracksToLoad = data.tracks.slice(0, itemsToLoad);
         const imageData = await topContentService.getImagesForContent([], tracksToLoad);
         
         const updatedTracks = data.tracks.map(track => {
@@ -38,20 +41,12 @@ export default function TopTracks({ period = 'all_time', limit = 5 }) {
     };
 
     loadImagesForTracks();
-  }, [data, visibleCount]);
+  }, [data, showExpanded]);
 
-  const showMore = () => {
-    if (data?.tracks) {
-      setVisibleCount(Math.min(visibleCount + 10, data.tracks.length));
-    }
+  const toggleExpanded = () => {
+    setShowExpanded(!showExpanded);
   };
 
-  const showLess = () => {
-    setVisibleCount(3);
-  };
-
-  const canShowMore = data?.tracks && visibleCount < data.tracks.length;
-  const canShowLess = visibleCount > 3;
   const hasImages = itemsWithImages.length > 0;
 
   if (loading) {
@@ -75,37 +70,42 @@ export default function TopTracks({ period = 'all_time', limit = 5 }) {
 
   return (
     <div className="top-tracks-section">
-      <TopContentList 
-        title="Top Tracks" 
-        items={displayData} 
-        type="tracks"
-        loading={false}
-        error={null}
-        visibleCount={visibleCount}
-        loadingImages={loadingImages}
-      />
-      
-      {(canShowMore || canShowLess) && (
-        <div className="show-more-section">
-          {canShowMore && (
+      {!showExpanded ? (
+        <>
+          <TopContentCarousel 
+            items={displayData}
+            type="tracks"
+            title="Top Tracks"
+          />
+          
+          <div className="carousel-actions">
             <button 
-              onClick={showMore} 
+              onClick={toggleExpanded}
               className="show-more-btn"
               disabled={loadingImages}
             >
-              {loadingImages ? 'Loading images...' : 'Show More'}
+              {loadingImages ? 'Loading...' : 'Show More'}
             </button>
-          )}
-          {canShowLess && (
+          </div>
+        </>
+      ) : (
+        <>
+          <ExpandableTopList
+            items={displayData}
+            type="tracks"
+            title="All Top Tracks"
+            loadingImages={loadingImages}
+          />
+          
+          <div className="carousel-actions">
             <button 
-              onClick={showLess} 
+              onClick={toggleExpanded}
               className="show-less-btn"
-              disabled={loadingImages}
             >
               Show Less
             </button>
-          )}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
