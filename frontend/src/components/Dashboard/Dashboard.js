@@ -3,7 +3,7 @@ import { useAnalytics } from '../../hooks/useAnalytics';
 import HeroStats from './HeroStats';
 import StatsGrid from './StatsGrid';
 import TopMusic from './TopMusic';
-import TopContent from './TopContent';
+import TopPodcasts from './TopPodcasts';
 import TimePeriodSelector from './TimePeriodSelector';
 
 export default function Dashboard() {
@@ -31,7 +31,7 @@ export default function Dashboard() {
       
       <TopMusic period={selectedPeriod} limit={100} />
       
-      <TopContent period={selectedPeriod} limit={5} />
+      <TopPodcasts period={selectedPeriod} limit={5} />
     </div>
   );
 }

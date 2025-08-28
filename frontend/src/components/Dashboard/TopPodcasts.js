@@ -1,12 +1,12 @@
 import { useTopContent } from '../../hooks/useTopContent';
 import TopContentList from './TopContentList';
-import './TopContent.css';
+import './TopPodcasts.css';
 
-export default function TopContent({ period = 'all_time', limit = 5 }) {
+export default function TopPodcasts({ period = 'all_time', limit = 5 }) {
   const { data, loading, error } = useTopContent(period, limit);
 
   if (loading) {
-    return <div className="top-content-loading">Loading top Podcasts...</div>;
+    return <div className="top-content-loading">Loading your top Podcasts...</div>;
   }
 
   if (error) {
