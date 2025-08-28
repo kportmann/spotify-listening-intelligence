@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { topContentService } from '../services/topContentService';
+import { musicService } from '../services/musicService';
+import { podcastService } from '../services/podcastService';
 
 export function useTopContent(period = 'all_time', limit = 5) {
   const [data, setData] = useState(null);
@@ -7,8 +8,16 @@ export function useTopContent(period = 'all_time', limit = 5) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    topContentService.getAllTopContent(period, limit)
-      .then(setData)
+    Promise.all([
+      musicService.getAllTopMusicContent(period, limit),
+      podcastService.getAllTopPodcastContent(period, limit)
+    ])
+      .then(([musicData, podcastData]) => {
+        setData({
+          ...musicData,
+          ...podcastData
+        });
+      })
       .catch(setError)
       .finally(() => setLoading(false));
   }, [period, limit]);
@@ -22,7 +31,7 @@ export function useTopArtists(period = 'all_time', limit = 10) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    topContentService.getTopArtists(period, limit)
+    musicService.getTopArtists(period, limit)
       .then(setArtists)
       .catch(setError)
       .finally(() => setLoading(false));
@@ -37,7 +46,7 @@ export function useTopTracks(period = 'all_time', limit = 10) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    topContentService.getTopTracks(period, limit)
+    musicService.getTopTracks(period, limit)
       .then(setTracks)
       .catch(setError)
       .finally(() => setLoading(false));
@@ -52,7 +61,7 @@ export function useTopEpisodes(period = 'all_time', limit = 10) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    topContentService.getTopEpisodes(period, limit)
+    podcastService.getTopEpisodes(period, limit, true)
       .then(setEpisodes)
       .catch(setError)
       .finally(() => setLoading(false));
@@ -67,7 +76,7 @@ export function useTopShows(period = 'all_time', limit = 10) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    topContentService.getTopShows(period, limit)
+    podcastService.getTopShows(period, limit, true)
       .then(setShows)
       .catch(setError)
       .finally(() => setLoading(false));
@@ -82,7 +91,7 @@ export function useTopAudiobooks(period = 'all_time', limit = 10) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    topContentService.getTopAudiobooks(period, limit)
+    podcastService.getTopAudiobooks(period, limit)
       .then(setAudiobooks)
       .catch(setError)
       .finally(() => setLoading(false));

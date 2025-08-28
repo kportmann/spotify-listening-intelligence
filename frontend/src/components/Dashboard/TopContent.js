@@ -6,11 +6,11 @@ export default function TopContent({ period = 'all_time', limit = 5 }) {
   const { data, loading, error } = useTopContent(period, limit);
 
   if (loading) {
-    return <div className="top-content-loading">Loading top content...</div>;
+    return <div className="top-content-loading">Loading top Podcasts...</div>;
   }
 
   if (error) {
-    return <div className="top-content-error">Error loading top content: {error.message}</div>;
+    return <div className="top-content-error">Error loading top Podcasts: {error.message}</div>;
   }
 
   if (!data) {

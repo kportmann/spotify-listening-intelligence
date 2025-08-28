@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTopContent } from '../../hooks/useTopContent';
-import { topContentService } from '../../services/topContentService';
+import { musicService } from '../../services/musicService';
 import TopContentCarousel from './TopContentCarousel';
 import ExpandableTopList from './ExpandableTopList';
 import './TopTracks.css';
@@ -22,7 +22,7 @@ export default function TopTracks({ period = 'all_time', limit = 100 }) {
         // Load images for more items when expanded, otherwise just top 10
         const itemsToLoad = showExpanded ? 40 : 10;
         const tracksToLoad = data.tracks.slice(0, itemsToLoad);
-        const imageData = await topContentService.getImagesForContent([], tracksToLoad);
+        const imageData = await musicService.getImagesForContent([], tracksToLoad);
         
         const updatedTracks = data.tracks.map(track => {
           const key = `${track.track_name}|${track.artist_name}`;

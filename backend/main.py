@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config.settings import get_settings
-from routers import basicStatsAnalytics, topContentAnalytics
+from routers import basicAnalytics, musicAnalytics, podcastAnalytics
 
 settings = get_settings()
 
@@ -19,8 +19,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(basicStatsAnalytics.router, prefix="/api/v1/basicStats", tags=["basicStats"])
-app.include_router(topContentAnalytics.router, prefix="/api/v1/topContent", tags=["topContent"])
+app.include_router(basicAnalytics.router, prefix="/api/v1/basicStats", tags=["basicStats"])
+app.include_router(musicAnalytics.router, prefix="/api/v1/music", tags=["music"])
+app.include_router(podcastAnalytics.router, prefix="/api/v1/podcasts", tags=["podcasts"])
 
 @app.get("/")
 async def root():

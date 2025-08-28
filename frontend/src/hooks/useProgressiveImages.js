@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { topContentService } from '../services/topContentService';
+import { musicService } from '../services/musicService';
 
 export const useProgressiveImages = (data, initialLoadCount = 3) => {
   const [itemsWithImages, setItemsWithImages] = useState({});
@@ -23,7 +23,7 @@ export const useProgressiveImages = (data, initialLoadCount = 3) => {
           return;
         }
 
-        const imageData = await topContentService.getImagesForContent(artistsToLoad, tracksToLoad);
+        const imageData = await musicService.getImagesForContent(artistsToLoad, tracksToLoad);
         
         // Update items with their images
         const updatedItems = {};
