@@ -14,6 +14,8 @@ router = APIRouter()
 class ImageRequest(BaseModel):
     artists: Optional[List[str]] = None
     tracks: Optional[List[dict]] = None  # [{"track_name": "...", "artist_name": "..."}]
+    episodes: Optional[List[dict]] = None  # [{"episode_name": "...", "show_name": "..."}]
+    shows: Optional[List[str]] = None
 
 
 @router.post("/images/batch")
@@ -21,7 +23,9 @@ async def get_batch_images(request: ImageRequest):
     """Fetch images for multiple artists and/or tracks in a single request"""
     results = {
         "artist_images": {},
-        "track_images": {}
+        "track_images": {},
+        "episode_images": {},
+        "show_images": {}
     }
     
     # Fetch artist images
@@ -57,6 +61,40 @@ async def get_batch_images(request: ImageRequest):
             except Exception as e:
                 print(f"Failed to fetch image for track {track_name} by {artist_name}: {e}")
                 results["track_images"][key] = None
+    
+    # Fetch episode images
+    if request.episodes:
+        for episode_info in request.episodes:
+            episode_name = episode_info["episode_name"]
+            show_name = episode_info.get("show_name")
+            key = f"{episode_name}|{show_name or ''}"
+            
+            try:
+                spotify_episode = await spotify_service.search_episode(episode_name, show_name)
+                if spotify_episode and spotify_episode.images:
+                    # Get medium size image (usually index 1) or first available
+                    image_url = spotify_episode.images[1].url if len(spotify_episode.images) > 1 else spotify_episode.images[0].url
+                    results["episode_images"][key] = image_url
+                else:
+                    results["episode_images"][key] = None
+            except Exception as e:
+                print(f"Failed to fetch image for episode {episode_name}: {e}")
+                results["episode_images"][key] = None
+    
+    # Fetch show images
+    if request.shows:
+        for show_name in request.shows:
+            try:
+                spotify_show = await spotify_service.search_show(show_name)
+                if spotify_show and spotify_show.images:
+                    # Get medium size image (usually index 1) or first available
+                    image_url = spotify_show.images[1].url if len(spotify_show.images) > 1 else spotify_show.images[0].url
+                    results["show_images"][show_name] = image_url
+                else:
+                    results["show_images"][show_name] = None
+            except Exception as e:
+                print(f"Failed to fetch image for show {show_name}: {e}")
+                results["show_images"][show_name] = None
     
     return results
 
@@ -196,7 +234,8 @@ async def get_top_tracks(
 async def get_top_episodes(
     db: Session = Depends(get_db),
     period: Optional[str] = Query("all_time", description="Time period: 7d, 1m, 3m, 6m, 1y, all_time"),
-    limit: Optional[int] = Query(50, description="Number of results to return")
+    limit: Optional[int] = Query(50, description="Number of results to return"),
+    include_images: Optional[bool] = Query(False, description="Include episode images from Spotify API")
 ):
     """Get top podcast episodes by listening time"""
     
@@ -228,22 +267,44 @@ async def get_top_episodes(
         desc('total_ms')
     ).limit(limit).all()
     
-    return [
-        {
+    # Basic episode data (fast)
+    episode_data_list = []
+    for result in results:
+        episode_data = {
             "episode_name": result.episode_name,
             "show_name": result.show_name,
             "total_ms": result.total_ms,
             "total_hours": round(result.total_ms / (1000 * 60 * 60), 1),
-            "play_count": result.play_count
+            "play_count": result.play_count,
+            "image_url": None
         }
-        for result in results
-    ]
+        episode_data_list.append(episode_data)
+    
+    # Only fetch images if explicitly requested
+    if include_images:
+        for episode_data in episode_data_list:
+            try:
+                spotify_episode = await spotify_service.search_episode(
+                    episode_data["episode_name"], 
+                    episode_data["show_name"]
+                )
+                if spotify_episode and spotify_episode.images:
+                    # Get medium size image (usually index 1) or first available
+                    image_url = spotify_episode.images[1].url if len(spotify_episode.images) > 1 else spotify_episode.images[0].url
+                    episode_data["image_url"] = image_url
+            except Exception as e:
+                # Continue without image if Spotify API fails
+                print(f"Failed to fetch image for episode {episode_data['episode_name']}: {e}")
+                pass
+    
+    return episode_data_list
 
 @router.get("/top/shows")
 async def get_top_shows(
     db: Session = Depends(get_db),
     period: Optional[str] = Query("all_time", description="Time period: 7d, 1m, 3m, 6m, 1y, all_time"),
-    limit: Optional[int] = Query(50, description="Number of results to return")
+    limit: Optional[int] = Query(50, description="Number of results to return"),
+    include_images: Optional[bool] = Query(False, description="Include show images from Spotify API")
 ):
     """Get top podcast shows by listening time"""
     
@@ -273,15 +334,33 @@ async def get_top_shows(
         desc('total_ms')
     ).limit(limit).all()
     
-    return [
-        {
+    # Basic show data (fast)
+    show_data_list = []
+    for result in results:
+        show_data = {
             "show_name": result.show_name,
             "total_ms": result.total_ms,
             "total_hours": round(result.total_ms / (1000 * 60 * 60), 1),
-            "play_count": result.play_count
+            "play_count": result.play_count,
+            "image_url": None
         }
-        for result in results
-    ]
+        show_data_list.append(show_data)
+    
+    # Only fetch images if explicitly requested
+    if include_images:
+        for show_data in show_data_list:
+            try:
+                spotify_show = await spotify_service.search_show(show_data["show_name"])
+                if spotify_show and spotify_show.images:
+                    # Get medium size image (usually index 1) or first available
+                    image_url = spotify_show.images[1].url if len(spotify_show.images) > 1 else spotify_show.images[0].url
+                    show_data["image_url"] = image_url
+            except Exception as e:
+                # Continue without image if Spotify API fails
+                print(f"Failed to fetch image for show {show_data['show_name']}: {e}")
+                pass
+    
+    return show_data_list
 
 @router.get("/top/audiobooks")
 async def get_top_audiobooks(

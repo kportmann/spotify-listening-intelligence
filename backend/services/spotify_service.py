@@ -30,6 +30,22 @@ class SpotifyTrack(BaseModel):
     album_images: List[SpotifyImage]
 
 
+class SpotifyShow(BaseModel):
+    id: str
+    name: str
+    description: str
+    images: List[SpotifyImage]
+    publisher: str
+
+
+class SpotifyEpisode(BaseModel):
+    id: str
+    name: str
+    description: str
+    images: List[SpotifyImage]
+    show: SpotifyShow
+
+
 class SpotifyService:
     def __init__(self):
         settings = get_settings()
@@ -211,6 +227,118 @@ class SpotifyService:
                 artists=[artist["name"] for artist in track["artists"]],
                 album_name=track["album"]["name"],
                 album_images=[SpotifyImage(**img) for img in track["album"]["images"]]
+            )
+            
+            # Cache the result
+            self._set_cache(cache_key, result)
+            return result
+    
+    async def search_show(self, show_name: str) -> Optional[SpotifyShow]:
+        """Search for podcast show and return show data with images"""
+        # Check cache first
+        cache_key = self._get_cache_key("show", show_name.lower())
+        cached_result = self._get_from_cache(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
+        access_token = await self.get_client_credentials_token()
+        
+        headers = {"Authorization": f"Bearer {access_token}"}
+        params = {
+            "q": show_name,
+            "type": "show",
+            "limit": 1
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/search", 
+                headers=headers, 
+                params=params
+            )
+            
+            if response.status_code != 200:
+                return None
+            
+            data = response.json()
+            shows = data.get("shows", {}).get("items", [])
+            
+            if not shows:
+                # Cache negative results too
+                self._set_cache(cache_key, None)
+                return None
+            
+            show = shows[0]
+            result = SpotifyShow(
+                id=show["id"],
+                name=show["name"],
+                description=show["description"],
+                images=[SpotifyImage(**img) for img in show["images"]],
+                publisher=show["publisher"]
+            )
+            
+            # Cache the result
+            self._set_cache(cache_key, result)
+            return result
+    
+    async def search_episode(self, episode_name: str, show_name: str = None) -> Optional[SpotifyEpisode]:
+        """Search for podcast episode and return episode data with images"""
+        # Check cache first
+        cache_key = self._get_cache_key("episode", f"{episode_name}|{show_name or ''}".lower())
+        cached_result = self._get_from_cache(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
+        access_token = await self.get_client_credentials_token()
+        
+        headers = {"Authorization": f"Bearer {access_token}"}
+        # Build search query
+        query = episode_name
+        if show_name:
+            query = f"{episode_name} show:{show_name}"
+        
+        params = {
+            "q": query,
+            "type": "episode",
+            "limit": 1
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/search", 
+                headers=headers, 
+                params=params
+            )
+            
+            if response.status_code != 200:
+                return None
+            
+            data = response.json()
+            episodes = data.get("episodes", {}).get("items", [])
+            
+            if not episodes:
+                # Cache negative results too
+                self._set_cache(cache_key, None)
+                return None
+            
+            episode = episodes[0]
+            
+            # Create show object from episode data
+            show_data = episode["show"]
+            show = SpotifyShow(
+                id=show_data["id"],
+                name=show_data["name"],
+                description=show_data["description"],
+                images=[SpotifyImage(**img) for img in show_data["images"]],
+                publisher=show_data["publisher"]
+            )
+            
+            result = SpotifyEpisode(
+                id=episode["id"],
+                name=episode["name"],
+                description=episode["description"],
+                images=[SpotifyImage(**img) for img in episode["images"]],
+                show=show
             )
             
             # Cache the result

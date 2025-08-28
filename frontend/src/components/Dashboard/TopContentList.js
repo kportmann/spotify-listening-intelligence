@@ -74,6 +74,11 @@ export default function TopContentList({
         return (
           <div key={index} className="top-content-item">
             <span className="rank">#{index + 1}</span>
+            {item.image_url && (
+              <div className="episode-image">
+                <img src={item.image_url} alt={item.episode_name} />
+              </div>
+            )}
             <div className="content-info">
               <div className="primary-text">{item.episode_name}</div>
               <div className="secondary-text">{item.show_name} • {item.total_hours}h</div>
@@ -85,6 +90,11 @@ export default function TopContentList({
         return (
           <div key={index} className="top-content-item">
             <span className="rank">#{index + 1}</span>
+            {item.image_url && (
+              <div className="show-image">
+                <img src={item.image_url} alt={item.show_name} />
+              </div>
+            )}
             <div className="content-info">
               <div className="primary-text">{item.show_name}</div>
               <div className="secondary-text">{item.total_hours}h • {item.play_count} episodes</div>
