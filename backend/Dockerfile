@@ -13,10 +13,24 @@ WORKDIR /app
 # Copy dependency files and install them
 # This leverages Docker's layer caching
 COPY pyproject.toml ./
-RUN uv pip install --system -r pyproject.toml
+RUN uv pip install -r pyproject.toml
+
+# Runtime stage
+FROM python:3.11-slim
+
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Make sure we use venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
 
 # Copy source code
 COPY . .
 
 # Expose port
 EXPOSE 8000
+
+# Command to start the application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

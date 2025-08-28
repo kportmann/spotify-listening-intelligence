@@ -1,0 +1,110 @@
+.listening-patterns-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.listening-patterns-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.page-title::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  border-radius: 2px;
+}
+
+.page-description {
+  font-size: 1.2rem;
+  color: #b3b3b3;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.patterns-content {
+  display: grid;
+  gap: 2rem;
+}
+
+.pattern-section {
+  background: #282828;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid #3e3e3e;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: #b3b3b3;
+}
+
+.placeholder-content p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.placeholder-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.placeholder-content li {
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  position: relative;
+}
+
+.placeholder-content li::before {
+  content: '🎵';
+  margin-right: 0.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .listening-patterns-page {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .page-description {
+    font-size: 1rem;
+  }
+  
+  .pattern-section {
+    padding: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.3rem;
+  }
+}

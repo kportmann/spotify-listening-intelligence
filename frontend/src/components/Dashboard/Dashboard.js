@@ -5,6 +5,7 @@ import StatsGrid from './StatsGrid';
 import TopMusic from './TopMusic';
 import TopPodcasts from './TopPodcasts';
 import TimePeriodSelector from './TimePeriodSelector';
+import WannaSeeMore from './WannaSeeMore';
 
 export default function Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('all_time');
@@ -32,6 +33,8 @@ export default function Dashboard() {
       <TopMusic period={selectedPeriod} limit={100} />
       
       <TopPodcasts period={selectedPeriod} limit={5} />
+      
+      <WannaSeeMore />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import json
 import logging
 from pathlib import Path
 from typing import List, Optional, Dict, Any
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import IntegrityError
 from pydantic import ValidationError

@@ -4,14 +4,15 @@ services:
     build:
       context: ./backend
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "${BACKEND_PORT}:8000"
     volumes:
-      - ./backend/app:/home/appuser/app  # Mount app code for live reloading
+      - ./backend:/app  # Mount backend code for live reloading
+      - ./data:/data  # Mount data directory for streaming history files
+      - /app/__pycache__  # Prevent local pycache from overwriting container's
     env_file:
       - .env
     depends_on:
       - db
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
   # Frontend React Service
   frontend:
