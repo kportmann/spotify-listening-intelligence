@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, extract
 from database.connection import get_db
 from database.schema import SpotifyStream
 from services.spotify_service import spotify_service
@@ -63,7 +63,7 @@ async def get_batch_images(request: ImageRequest):
 @router.get("/top/artists")
 async def get_top_artists(
     db: Session = Depends(get_db),
-    period: Optional[str] = Query("all_time", description="Time period: 7d, 1m, 3m, 6m, 1y, all_time"),
+    period: Optional[str] = Query("all_time", description="Time period: 7d, 1m, 3m, 6m, 1y, all_time, or year (e.g., 2024)"),
     limit: Optional[int] = Query(50, description="Number of results to return"),
     include_images: Optional[bool] = Query(False, description="Include artist images from Spotify API")
 ):
@@ -80,9 +80,14 @@ async def get_top_artists(
     
     # Apply time filter
     if period != "all_time":
-        cutoff_date = _get_cutoff_date(period)
-        if cutoff_date:
-            query = query.filter(SpotifyStream.ts >= cutoff_date)
+        # Check if period is a year (4 digits)
+        if period.isdigit() and len(period) == 4:
+            year = int(period)
+            query = query.filter(extract('year', SpotifyStream.ts) == year)
+        else:
+            cutoff_date = _get_cutoff_date(period)
+            if cutoff_date:
+                query = query.filter(SpotifyStream.ts >= cutoff_date)
     
     results = query.group_by(
         SpotifyStream.master_metadata_album_artist_name
@@ -121,7 +126,7 @@ async def get_top_artists(
 @router.get("/top/tracks")
 async def get_top_tracks(
     db: Session = Depends(get_db),
-    period: Optional[str] = Query("all_time", description="Time period: 7d, 1m, 3m, 6m, 1y, all_time"),
+    period: Optional[str] = Query("all_time", description="Time period: 7d, 1m, 3m, 6m, 1y, all_time, or year (e.g., 2024)"),
     limit: Optional[int] = Query(50, description="Number of results to return"),
     include_images: Optional[bool] = Query(False, description="Include album artwork from Spotify API")
 ):
@@ -140,9 +145,14 @@ async def get_top_tracks(
     
     # Apply time filter
     if period != "all_time":
-        cutoff_date = _get_cutoff_date(period)
-        if cutoff_date:
-            query = query.filter(SpotifyStream.ts >= cutoff_date)
+        # Check if period is a year (4 digits)
+        if period.isdigit() and len(period) == 4:
+            year = int(period)
+            query = query.filter(extract('year', SpotifyStream.ts) == year)
+        else:
+            cutoff_date = _get_cutoff_date(period)
+            if cutoff_date:
+                query = query.filter(SpotifyStream.ts >= cutoff_date)
     
     results = query.group_by(
         SpotifyStream.master_metadata_track_name,
@@ -202,9 +212,14 @@ async def get_top_episodes(
     
     # Apply time filter
     if period != "all_time":
-        cutoff_date = _get_cutoff_date(period)
-        if cutoff_date:
-            query = query.filter(SpotifyStream.ts >= cutoff_date)
+        # Check if period is a year (4 digits)
+        if period.isdigit() and len(period) == 4:
+            year = int(period)
+            query = query.filter(extract('year', SpotifyStream.ts) == year)
+        else:
+            cutoff_date = _get_cutoff_date(period)
+            if cutoff_date:
+                query = query.filter(SpotifyStream.ts >= cutoff_date)
     
     results = query.group_by(
         SpotifyStream.episode_name,
@@ -243,9 +258,14 @@ async def get_top_shows(
     
     # Apply time filter
     if period != "all_time":
-        cutoff_date = _get_cutoff_date(period)
-        if cutoff_date:
-            query = query.filter(SpotifyStream.ts >= cutoff_date)
+        # Check if period is a year (4 digits)
+        if period.isdigit() and len(period) == 4:
+            year = int(period)
+            query = query.filter(extract('year', SpotifyStream.ts) == year)
+        else:
+            cutoff_date = _get_cutoff_date(period)
+            if cutoff_date:
+                query = query.filter(SpotifyStream.ts >= cutoff_date)
     
     results = query.group_by(
         SpotifyStream.episode_show_name
@@ -282,9 +302,14 @@ async def get_top_audiobooks(
     
     # Apply time filter
     if period != "all_time":
-        cutoff_date = _get_cutoff_date(period)
-        if cutoff_date:
-            query = query.filter(SpotifyStream.ts >= cutoff_date)
+        # Check if period is a year (4 digits)
+        if period.isdigit() and len(period) == 4:
+            year = int(period)
+            query = query.filter(extract('year', SpotifyStream.ts) == year)
+        else:
+            cutoff_date = _get_cutoff_date(period)
+            if cutoff_date:
+                query = query.filter(SpotifyStream.ts >= cutoff_date)
     
     results = query.group_by(
         SpotifyStream.audiobook_title

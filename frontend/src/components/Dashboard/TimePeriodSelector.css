@@ -1,0 +1,68 @@
+.time-period-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  margin: 1.5rem 0;
+  border-bottom: 1px solid #282c34;
+}
+
+.time-period-label {
+  font-size: 1rem;
+  color: #a0a0a0;
+  font-weight: 500;
+}
+
+.time-period-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.period-btn {
+  padding: 0.5rem 1.2rem;
+  border: 2px solid #1DB954;
+  border-radius: 20px;
+  background: transparent;
+  color: #1DB954;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+.period-btn:hover {
+  background: #1DB954;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.period-btn.active {
+  background: #1DB954;
+  color: white;
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+}
+
+.period-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .time-period-selector {
+    padding: 1.5rem 0.5rem;
+  }
+  
+  .time-period-buttons {
+    gap: 0.5rem;
+  }
+  
+  .period-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    min-width: 70px;
+  }
+}

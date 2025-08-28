@@ -1,44 +1,55 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, extract
 from database.connection import get_db
 from database.schema import SpotifyStream
 
 router = APIRouter()
 
 @router.get("/stats/overview")
-async def get_stats_overview(db: Session = Depends(get_db)):
+async def get_stats_overview(year: int = None, db: Session = Depends(get_db)):
     """Get comprehensive listening statistics overview"""
     
+    # Base query with optional year filter
+    base_query = db.query(SpotifyStream)
+    if year:
+        base_query = base_query.filter(extract('year', SpotifyStream.ts) == year)
+    
     # Get date range of streaming data
-    date_range = db.query(
+    date_range = base_query.with_entities(
         func.min(SpotifyStream.ts).label('first_stream'),
         func.max(SpotifyStream.ts).label('last_stream')
     ).first()
     
     # Total stats for all content
-    total_stats = db.query(
+    total_stats = base_query.with_entities(
         func.sum(SpotifyStream.ms_played).label('total_ms'),
         func.count(SpotifyStream.id).label('total_streams')
     ).first()
     
     # Music tracks stats  
-    music_stats = db.query(
+    music_stats = base_query.filter(
+        SpotifyStream.spotify_track_uri.isnot(None)
+    ).with_entities(
         func.sum(SpotifyStream.ms_played).label('music_ms'),
         func.count(SpotifyStream.id).label('music_streams')
-    ).filter(SpotifyStream.spotify_track_uri.isnot(None)).first()
+    ).first()
     
     # Episodes stats
-    episode_stats = db.query(
+    episode_stats = base_query.filter(
+        SpotifyStream.spotify_episode_uri.isnot(None)
+    ).with_entities(
         func.sum(SpotifyStream.ms_played).label('episode_ms'),
         func.count(SpotifyStream.id).label('episode_streams')
-    ).filter(SpotifyStream.spotify_episode_uri.isnot(None)).first()
+    ).first()
     
     # Audiobook stats
-    audiobook_stats = db.query(
+    audiobook_stats = base_query.filter(
+        SpotifyStream.audiobook_chapter_uri.isnot(None)
+    ).with_entities(
         func.sum(SpotifyStream.ms_played).label('audiobook_ms'),
         func.count(SpotifyStream.id).label('audiobook_streams')
-    ).filter(SpotifyStream.audiobook_chapter_uri.isnot(None)).first()
+    ).first()
     
     # Calculate days between first and last stream
     streaming_days = 0
@@ -79,4 +90,20 @@ async def get_stats_overview(db: Session = Depends(get_db)):
             "total_ms": audiobook_stats.audiobook_ms or 0,
             "stream_count": audiobook_stats.audiobook_streams or 0
         }
+    }
+
+@router.get("/stats/available-years")
+async def get_available_years(db: Session = Depends(get_db)):
+    """Get list of years with streaming data"""
+    
+    # Get distinct years from streaming data
+    years_query = db.query(
+        extract('year', SpotifyStream.ts).label('year')
+    ).distinct().order_by(extract('year', SpotifyStream.ts).desc())
+    
+    years = [int(year[0]) for year in years_query.all()]
+    
+    return {
+        "years": years,
+        "total_years": len(years)
     }

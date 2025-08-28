@@ -1,14 +1,20 @@
 import StatCard from '../common/StatCard/StatCard';
 import './StatsGrid.css';
 
-export default function StatsGrid({ stats }) {
+export default function StatsGrid({ stats, period = 'all_time' }) {
   if (!stats) {
     return null;
   }
 
+  const getPeriodLabel = (period) => {
+    if (period === 'all_time') return 'All Time';
+    if (period && period.length === 4 && !isNaN(period)) return period;
+    return period;
+  };
+
   return (
     <div className="stats-section">
-      <h2 className="stats-header">Music Quick Stats</h2>
+      <h2 className="stats-header">Music Quick Stats {period !== 'all_time' ? `- ${getPeriodLabel(period)}` : ''}</h2>
       <div className="stats-grid">
         <StatCard 
           title="Music Hours" 

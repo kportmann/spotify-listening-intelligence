@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import HeroStats from './HeroStats';
 import StatsGrid from './StatsGrid';
 import TopMusic from './TopMusic';
 import TopContent from './TopContent';
+import TimePeriodSelector from './TimePeriodSelector';
 
 export default function Dashboard() {
-  const { stats, loading, error } = useAnalytics();
+  const [selectedPeriod, setSelectedPeriod] = useState('all_time');
+  const { stats, loading, error } = useAnalytics(selectedPeriod);
 
   if (loading) {
     return <div className="dashboard-loading">Loading dashboard...</div>;
@@ -19,11 +22,16 @@ export default function Dashboard() {
     <div className="dashboard">
       <HeroStats stats={stats} />
       
-      <StatsGrid stats={stats} />
+      <TimePeriodSelector 
+        selectedPeriod={selectedPeriod}
+        onPeriodChange={setSelectedPeriod}
+      />
       
-      <TopMusic period="all_time" limit={100} />
+      <StatsGrid stats={stats} period={selectedPeriod} />
       
-      <TopContent period="all_time" limit={5} />
+      <TopMusic period={selectedPeriod} limit={100} />
+      
+      <TopContent period={selectedPeriod} limit={5} />
     </div>
   );
 }
