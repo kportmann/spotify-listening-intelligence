@@ -107,3 +107,155 @@ async def get_listening_heatmap(year: int = None, timezone: str = "UTC", db: Ses
             'peak_hour': peak_hour_info
         }
     }
+
+
+@router.get("/monthly-trends")
+async def get_monthly_trends(year: int = None, timezone: str = "UTC", db: Session = Depends(get_db)):
+    """Get monthly listening trends showing activity by month
+    
+    Args:
+        year: Optional year filter
+        timezone: Timezone for conversion (e.g., 'Europe/Zurich', 'America/New_York', 'UTC')
+    """
+    
+    # Base query
+    base_query = db.query(SpotifyStream).filter(
+        SpotifyStream.spotify_track_uri.isnot(None)
+    )
+    
+    if year:
+        base_query = base_query.filter(extract('year', SpotifyStream.ts) == year)
+    
+    # Convert timestamps to specified timezone for analysis
+    if timezone == "UTC":
+        ts_converted = SpotifyStream.ts
+    else:
+        ts_converted = func.timezone(timezone, SpotifyStream.ts)
+    
+    # Get monthly data
+    monthly_data = base_query.with_entities(
+        extract('year', ts_converted).label('year'),
+        extract('month', ts_converted).label('month'),
+        func.count(SpotifyStream.id).label('stream_count'),
+        func.sum(SpotifyStream.ms_played).label('total_ms'),
+        func.avg(SpotifyStream.ms_played).label('avg_ms_per_stream')
+    ).group_by(
+        extract('year', ts_converted),
+        extract('month', ts_converted)
+    ).order_by(
+        extract('year', ts_converted),
+        extract('month', ts_converted)
+    ).all()
+    
+    # Format the data
+    monthly_trends = []
+    month_names = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ]
+    
+    for row in monthly_data:
+        monthly_trends.append({
+            'year': int(row.year),
+            'month': int(row.month),
+            'month_name': month_names[int(row.month) - 1],
+            'stream_count': row.stream_count,
+            'total_minutes': round((row.total_ms or 0) / (1000 * 60)),
+            'avg_minutes_per_stream': round((row.avg_ms_per_stream or 0) / (1000 * 60), 2)
+        })
+    
+    return {
+        'monthly_trends': monthly_trends,
+        'total_months': len(monthly_trends)
+    }
+
+
+@router.get("/seasonal-trends")
+async def get_seasonal_trends(year: int = None, timezone: str = "UTC", db: Session = Depends(get_db)):
+    """Get seasonal listening trends (Spring, Summer, Fall, Winter)
+    
+    Args:
+        year: Optional year filter
+        timezone: Timezone for conversion (e.g., 'Europe/Zurich', 'America/New_York', 'UTC')
+    """
+    
+    # Base query
+    base_query = db.query(SpotifyStream).filter(
+        SpotifyStream.spotify_track_uri.isnot(None)
+    )
+    
+    if year:
+        base_query = base_query.filter(extract('year', SpotifyStream.ts) == year)
+    
+    # Convert timestamps to specified timezone for analysis
+    if timezone == "UTC":
+        ts_converted = SpotifyStream.ts
+    else:
+        ts_converted = func.timezone(timezone, SpotifyStream.ts)
+    
+    # Get data grouped by month first
+    monthly_data = base_query.with_entities(
+        extract('year', ts_converted).label('year'),
+        extract('month', ts_converted).label('month'),
+        func.count(SpotifyStream.id).label('stream_count'),
+        func.sum(SpotifyStream.ms_played).label('total_ms')
+    ).group_by(
+        extract('year', ts_converted),
+        extract('month', ts_converted)
+    ).all()
+    
+    # Group by seasons
+    # Spring: March, April, May (3, 4, 5)
+    # Summer: June, July, August (6, 7, 8)
+    # Fall: September, October, November (9, 10, 11)
+    # Winter: December, January, February (12, 1, 2)
+    
+    seasonal_data = {
+        'Spring': {'stream_count': 0, 'total_ms': 0, 'years': set()},
+        'Summer': {'stream_count': 0, 'total_ms': 0, 'years': set()},
+        'Fall': {'stream_count': 0, 'total_ms': 0, 'years': set()},
+        'Winter': {'stream_count': 0, 'total_ms': 0, 'years': set()}
+    }
+    
+    for row in monthly_data:
+        month = int(row.month)
+        stream_count = row.stream_count or 0
+        total_ms = row.total_ms or 0
+        year = int(row.year)
+        
+        if month in [3, 4, 5]:  # Spring
+            seasonal_data['Spring']['stream_count'] += stream_count
+            seasonal_data['Spring']['total_ms'] += total_ms
+            seasonal_data['Spring']['years'].add(year)
+        elif month in [6, 7, 8]:  # Summer
+            seasonal_data['Summer']['stream_count'] += stream_count
+            seasonal_data['Summer']['total_ms'] += total_ms
+            seasonal_data['Summer']['years'].add(year)
+        elif month in [9, 10, 11]:  # Fall
+            seasonal_data['Fall']['stream_count'] += stream_count
+            seasonal_data['Fall']['total_ms'] += total_ms
+            seasonal_data['Fall']['years'].add(year)
+        else:  # Winter (12, 1, 2)
+            seasonal_data['Winter']['stream_count'] += stream_count
+            seasonal_data['Winter']['total_ms'] += total_ms
+            seasonal_data['Winter']['years'].add(year)
+    
+    # Format the results
+    seasonal_trends = []
+    for season, data in seasonal_data.items():
+        total_minutes = round(data['total_ms'] / (1000 * 60))
+        avg_streams_per_year = data['stream_count'] / max(len(data['years']), 1)
+        avg_minutes_per_year = total_minutes / max(len(data['years']), 1)
+        
+        seasonal_trends.append({
+            'season': season,
+            'total_streams': data['stream_count'],
+            'total_minutes': total_minutes,
+            'years_covered': len(data['years']),
+            'avg_streams_per_year': round(avg_streams_per_year),
+            'avg_minutes_per_year': round(avg_minutes_per_year)
+        })
+    
+    return {
+        'seasonal_trends': seasonal_trends
+    }

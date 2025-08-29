@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './ListeningPatterns.css';
 import ListeningHeatmap from './ListeningHeatmap';
+import MonthlyTrends from './MonthlyTrends';
+import SeasonalTrends from './SeasonalTrends';
 import TimePeriodSelector from '../common/TimePeriodSelector/TimePeriodSelector';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
 
@@ -24,16 +26,20 @@ export default function ListeningPatterns() {
       <div className="patterns-content">
         <ListeningHeatmap selectedYear={selectedPeriod === 'all_time' ? null : parseInt(selectedPeriod)} />
         
+        <MonthlyTrends selectedYear={selectedPeriod === 'all_time' ? null : parseInt(selectedPeriod)} />
+        
+        <SeasonalTrends selectedYear={selectedPeriod === 'all_time' ? null : parseInt(selectedPeriod)} />
+        
         <div className="pattern-section">
           <SectionTitle title="More Patterns Coming Soon" />
           <div className="placeholder-content">
             <p>Additional listening pattern analysis will be available here soon!</p>
             <p>Future features will include:</p>
             <ul>
-              <li>Monthly/seasonal listening trends</li>
               <li>Skip rate analysis</li>
               <li>Listening streaks and consistency metrics</li>
               <li>Genre preferences over time</li>
+              <li>Artist discovery patterns</li>
               <li>And much more!</li>
             </ul>
           </div>

@@ -1,0 +1,426 @@
+.seasonal-trends-container {
+  background: #282828;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid #3e3e3e;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+}
+
+.trends-loading,
+.trends-error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1rem;
+}
+
+.trends-loading {
+  color: #b3b3b3;
+}
+
+.trends-error {
+  color: #f44336;
+}
+
+.trends-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section-description {
+  color: #b3b3b3;
+  font-size: 0.85rem;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+}
+
+.seasons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.season-card {
+  background: rgba(29, 185, 84, 0.1);
+  border: 2px solid rgba(29, 185, 84, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.season-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.season-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.season-icon {
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+}
+
+.season-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+  color: #1db954;
+}
+
+.season-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #b3b3b3;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.stat-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat-progress {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+
+.years-covered {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.8rem;
+}
+
+.years-label {
+  color: #b3b3b3;
+}
+
+.years-value {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.seasonal-summary {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.summary-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summary-stat .stat-label {
+  font-size: 0.8rem;
+  color: #b3b3b3;
+}
+
+.summary-stat .stat-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1db954;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .seasons-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .seasonal-trends-container {
+    padding: 1.5rem;
+  }
+
+  .seasons-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .season-card {
+    padding: 1.5rem;
+  }
+
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .seasonal-trends-container {
+    padding: 1rem;
+  }
+
+  .seasons-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .season-card {
+    padding: 1.25rem;
+    /* Enhanced touch interaction */
+    transition: all 0.3s ease, transform 0.2s ease;
+  }
+
+  .season-card:active {
+    transform: scale(0.98);
+  }
+
+  .season-header {
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .season-icon {
+    font-size: 1.8rem;
+    width: 44px;
+    height: 44px;
+    /* Better touch target */
+  }
+
+  .season-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .stat-item {
+    gap: 0.4rem;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .stat-bar {
+    height: 8px; /* Thicker progress bars for better visibility */
+    border-radius: 4px;
+  }
+
+  .stat-progress {
+    border-radius: 4px;
+    /* Enhanced animation */
+    transition: width 1s ease-out;
+  }
+
+  .years-covered {
+    margin-top: 0.75rem;
+    padding-top: 1rem;
+  }
+
+  .years-value {
+    font-weight: 600;
+  }
+
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .section-description {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 640px) {
+  .season-header {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .season-icon {
+    font-size: 2rem;
+    width: 48px;
+    height: 48px;
+  }
+
+  .season-name {
+    font-size: 1.4rem;
+  }
+
+  .stat-bar {
+    height: 10px; /* Even thicker on smaller screens */
+  }
+
+  .summary-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .seasonal-trends-container {
+    padding: 0.75rem;
+  }
+
+  .season-card {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .season-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .season-icon {
+    font-size: 2.2rem;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px; /* More rounded on mobile */
+  }
+
+  .season-name {
+    font-size: 1.2rem;
+    margin-top: 0.25rem;
+  }
+
+  .season-stats {
+    gap: 1rem; /* More spacing between stats */
+  }
+
+  .stat-item {
+    gap: 0.3rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    text-align: center; /* Center align labels on mobile */
+  }
+
+  .stat-value {
+    font-size: 1rem;
+    text-align: center; /* Center align values on mobile */
+  }
+
+  .stat-bar {
+    height: 8px;
+    margin-top: 0.2rem;
+  }
+
+  .years-covered {
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .summary-stats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .summary-title {
+    font-size: 1.1rem;
+  }
+
+  .seasonal-summary {
+    padding: 1rem;
+  }
+
+  .summary-stat .stat-value {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .section-description {
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .seasonal-trends-container {
+    padding: 0.5rem;
+  }
+
+  .season-card {
+    padding: 0.75rem;
+  }
+
+  .season-icon {
+    font-size: 2rem;
+    width: 48px;
+    height: 48px;
+  }
+
+  .season-name {
+    font-size: 1.1rem;
+  }
+
+  .stat-value {
+    font-size: 0.95rem;
+  }
+
+  .summary-title {
+    font-size: 1rem;
+  }
+}

@@ -14,4 +14,32 @@ export const listeningPatternsService = {
     }
     return response.json();
   },
+
+  async getMonthlyTrends(year = null, timezone = 'UTC') {
+    const params = new URLSearchParams();
+    if (year) params.append('year', year);
+    if (timezone !== 'UTC') params.append('timezone', timezone);
+    
+    const url = `${API_BASE_URL}/listening-patterns/monthly-trends${params.toString() ? '?' + params.toString() : ''}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to fetch monthly trends data');
+    }
+    return response.json();
+  },
+
+  async getSeasonalTrends(year = null, timezone = 'UTC') {
+    const params = new URLSearchParams();
+    if (year) params.append('year', year);
+    if (timezone !== 'UTC') params.append('timezone', timezone);
+    
+    const url = `${API_BASE_URL}/listening-patterns/seasonal-trends${params.toString() ? '?' + params.toString() : ''}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to fetch seasonal trends data');
+    }
+    return response.json();
+  },
 };

@@ -1,0 +1,698 @@
+.monthly-trends-container {
+  background: #282828;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid #3e3e3e;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+}
+
+.trends-loading,
+.trends-error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1rem;
+}
+
+.trends-loading {
+  color: #b3b3b3;
+}
+
+.trends-error {
+  color: #f44336;
+}
+
+.trends-section {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-description {
+  color: #b3b3b3;
+  font-size: 0.85rem;
+  margin: 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+}
+
+.trends-chart-container {
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.chart-metrics {
+  display: flex;
+  gap: 2rem;
+}
+
+.metric {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.metric-legend {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+.streams-legend {
+  background: rgba(29, 185, 84, 0.8);
+}
+
+.minutes-legend {
+  background: rgba(30, 215, 96, 0.8);
+}
+
+/* Line Chart Styles */
+.line-charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.line-charts-container.single-year {
+  gap: 1rem;
+}
+
+.line-chart-section {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.chart-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.line-chart {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.chart-area {
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.chart-line {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+}
+
+.chart-point {
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.chart-point:hover {
+  transform: scale(1.2);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.point-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.month-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 500;
+  user-select: none;
+}
+
+.year-tooltip {
+  background: #000000;
+  border: 1px solid #3e3e3e;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.year-tooltip.single-year-tooltip {
+  margin-top: 1.5rem;
+}
+
+.tooltip-content {
+  text-align: center;
+}
+
+.tooltip-title {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.tooltip-stats {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.tooltip-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tooltip-label {
+  color: #b3b3b3;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.tooltip-value {
+  color: #1db954;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.yearly-charts {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.year-section {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.year-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(29, 185, 84, 0.3);
+}
+
+.year-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1db954;
+  margin: 0;
+}
+
+.year-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.year-stat {
+  font-size: 0.9rem;
+  color: #b3b3b3;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.year-chart {
+  min-height: 160px;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.6rem;
+  gap: 0.25rem;
+}
+
+.month-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 38px;
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  padding: 0.2rem;
+}
+
+.month-column:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.month-column.active {
+  background: rgba(29, 185, 84, 0.1);
+  transform: scale(1.02);
+}
+
+.month-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 140px;
+  margin-bottom: 0.4rem;
+}
+
+.month-bar {
+  width: 12px;
+  min-height: 2px;
+  border-radius: 2px 2px 0 0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.month-bar:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
+
+.streams-bar {
+  background: rgba(29, 185, 84, 0.6);
+}
+
+.minutes-bar {
+  background: rgba(30, 215, 96, 0.6);
+}
+
+.month-label {
+  text-align: center;
+}
+
+.month-name {
+  font-size: 0.8rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.month-year {
+  font-size: 0.7rem;
+  color: #b3b3b3;
+  margin-top: 0.2rem;
+}
+
+.month-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000000;
+  border: 1px solid #3e3e3e;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  min-width: 180px;
+  animation: tooltipFadeIn 0.2s ease-out;
+}
+
+.month-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #000000;
+}
+
+.tooltip-title {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.tooltip-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tooltip-stat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.tooltip-label {
+  color: #b3b3b3;
+}
+
+.tooltip-value {
+  color: #1db954;
+  font-weight: 500;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.trends-summary {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1.5rem;
+}
+
+.summary-stat {
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #b3b3b3;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1db954;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .monthly-trends-container {
+    padding: 1.5rem;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .monthly-trends-container {
+    padding: 1rem;
+  }
+
+  .chart-metrics {
+    gap: 1rem;
+  }
+
+  /* Line Chart Responsive */
+  .line-charts-container {
+    gap: 1rem;
+  }
+
+  .line-chart-section {
+    padding: 0.75rem;
+  }
+
+  .chart-title {
+    margin-bottom: 0.75rem;
+  }
+
+  .line-chart {
+    max-width: 300px;
+    padding: 0.4rem;
+  }
+
+  .tooltip-stats {
+    gap: 1rem;
+  }
+
+  .tooltip-stat {
+    gap: 0.2rem;
+  }
+
+  .tooltip-label {
+    font-size: 0.7rem;
+  }
+
+  .tooltip-value {
+    font-size: 0.8rem;
+  }
+
+  /* Yearly sections responsive */
+  .yearly-charts {
+    gap: 1.5rem;
+  }
+
+  .year-section {
+    padding: 1rem;
+  }
+
+  .year-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .year-title {
+    font-size: 1.3rem;
+  }
+
+  .year-stats {
+    gap: 1rem;
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .year-stat {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    text-align: center;
+    flex: 1;
+  }
+
+  .year-tooltip {
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .month-bar:active {
+    transform: scale(1.1);
+  }
+
+  .month-bars {
+    gap: 3px;
+    height: 130px; /* Slightly taller */
+  }
+
+  .month-name {
+    font-size: 0.8rem; /* Improved readability */
+    font-weight: 600;
+  }
+
+  .month-year {
+    font-size: 0.7rem;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .section-description {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  /* Improve scroll indicator on mobile */
+  .monthly-chart::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 40px;
+    background: linear-gradient(to right, transparent, rgba(40, 40, 40, 0.8));
+    pointer-events: none;
+    border-radius: 4px 0 0 4px;
+  }
+}
+
+@media (max-width: 640px) {
+  .chart-metrics {
+    justify-content: space-around;
+    gap: 1.5rem;
+  }
+
+  .metric {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .metric-legend {
+    width: 20px;
+    height: 4px;
+    border-radius: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .monthly-trends-container {
+    padding: 0.75rem;
+  }
+
+  .chart-metrics {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .metric {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  /* Mobile Line Charts */
+  .line-charts-container {
+    gap: 0.75rem;
+  }
+
+  .line-chart-section {
+    padding: 0.5rem;
+  }
+
+  .chart-title {
+    margin-bottom: 0.5rem;
+  }
+
+  .line-chart {
+    max-width: 280px;
+    padding: 0.3rem;
+  }
+
+  .tooltip-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .tooltip-stat {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .tooltip-title {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .year-tooltip {
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .year-tooltip.single-year-tooltip {
+    margin-top: 1rem;
+  }
+
+  /* Mobile yearly sections */
+  .yearly-charts {
+    gap: 1rem;
+  }
+
+  .year-section {
+    padding: 0.75rem;
+  }
+
+  .year-header {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .year-title {
+    font-size: 1.2rem;
+  }
+
+  .year-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .year-stat {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .month-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .month-year {
+    font-size: 0.6rem;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .trends-summary {
+    padding: 1rem;
+  }
+
+  .section-description {
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+
+  /* Optimize for very small screens */
+  .stat-value {
+    font-size: 1rem;
+  }
+
+  .summary-stat .stat-label {
+    font-size: 0.75rem;
+  }
+}
