@@ -175,6 +175,13 @@
   color: #1db954;
 }
 
+.summary-stat .stat-subvalue {
+  font-size: 0.9rem;
+  color: #b3b3b3;
+  margin-top: 0.25rem;
+  font-weight: 400;
+}
+
 /* Responsive design */
 @media (max-width: 1200px) {
   .seasons-grid {

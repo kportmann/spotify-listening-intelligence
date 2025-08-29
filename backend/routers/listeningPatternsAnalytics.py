@@ -164,9 +164,29 @@ async def get_monthly_trends(year: int = None, timezone: str = "UTC", db: Sessio
             'avg_minutes_per_stream': round((row.avg_ms_per_stream or 0) / (1000 * 60), 2)
         })
     
+    # Calculate peak month by minutes
+    peak_month_by_minutes = None
+    peak_month_by_streams = None
+    
+    if monthly_trends:
+        peak_month_by_minutes = max(monthly_trends, key=lambda x: x['total_minutes'])
+        peak_month_by_streams = max(monthly_trends, key=lambda x: x['stream_count'])
+    
     return {
         'monthly_trends': monthly_trends,
-        'total_months': len(monthly_trends)
+        'total_months': len(monthly_trends),
+        'peak_month': {
+            'by_minutes': {
+                'month_name': peak_month_by_minutes['month_name'] if peak_month_by_minutes else None,
+                'year': peak_month_by_minutes['year'] if peak_month_by_minutes else None,
+                'total_minutes': peak_month_by_minutes['total_minutes'] if peak_month_by_minutes else 0
+            },
+            'by_streams': {
+                'month_name': peak_month_by_streams['month_name'] if peak_month_by_streams else None,
+                'year': peak_month_by_streams['year'] if peak_month_by_streams else None,
+                'stream_count': peak_month_by_streams['stream_count'] if peak_month_by_streams else 0
+            }
+        }
     }
 
 
@@ -256,6 +276,24 @@ async def get_seasonal_trends(year: int = None, timezone: str = "UTC", db: Sessi
             'avg_minutes_per_year': round(avg_minutes_per_year)
         })
     
+    # Calculate peak season by minutes
+    peak_season_by_minutes = None
+    peak_season_by_streams = None
+    
+    if seasonal_trends:
+        peak_season_by_minutes = max(seasonal_trends, key=lambda x: x['total_minutes'])
+        peak_season_by_streams = max(seasonal_trends, key=lambda x: x['total_streams'])
+    
     return {
-        'seasonal_trends': seasonal_trends
+        'seasonal_trends': seasonal_trends,
+        'peak_season': {
+            'by_minutes': {
+                'season': peak_season_by_minutes['season'] if peak_season_by_minutes else None,
+                'total_minutes': peak_season_by_minutes['total_minutes'] if peak_season_by_minutes else 0
+            },
+            'by_streams': {
+                'season': peak_season_by_streams['season'] if peak_season_by_streams else None,
+                'total_streams': peak_season_by_streams['total_streams'] if peak_season_by_streams else 0
+            }
+        }
     }

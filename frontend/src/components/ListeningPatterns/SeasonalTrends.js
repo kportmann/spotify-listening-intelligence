@@ -7,7 +7,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
   const [seasonalData, setSeasonalData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedTimezone] = useState('Europe/Zurich');
+  const [selectedTimezone] = useState('UTC');
 
   useEffect(() => {
     const fetchSeasonalTrends = async () => {
@@ -180,31 +180,6 @@ export default function SeasonalTrends({ selectedYear = null }) {
         })}
       </div>
 
-      <div className="seasonal-summary">
-        <div className="summary-title">Seasonal Overview</div>
-        <div className="summary-stats">
-          <div className="summary-stat">
-            <div className="stat-label">Most Active Season</div>
-            <div className="stat-value">
-              {(() => {
-                const mostActive = seasonalData.seasonal_trends.reduce((max, s) => 
-                  s.total_streams > max.total_streams ? s : max, seasonalData.seasonal_trends[0]);
-                return `${getSeasonIcon(mostActive.season)} ${mostActive.season}`;
-              })()}
-            </div>
-          </div>
-          <div className="summary-stat">
-            <div className="stat-label">Total Seasons</div>
-            <div className="stat-value">{seasonalData.seasonal_trends.length}</div>
-          </div>
-          <div className="summary-stat">
-            <div className="stat-label">Total Activity</div>
-            <div className="stat-value">
-              {seasonalData.seasonal_trends.reduce((sum, s) => sum + s.total_streams, 0).toLocaleString()} streams
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -7,8 +7,9 @@ export default function MonthlyTrends({ selectedYear = null }) {
   const [monthlyData, setMonthlyData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedTimezone] = useState('Europe/Zurich');
+  const [selectedTimezone] = useState('UTC');
   const [activeTooltip, setActiveTooltip] = useState(null);
+  const [showInsights, setShowInsights] = useState(false);
 
   useEffect(() => {
     const fetchMonthlyTrends = async () => {
@@ -285,8 +286,8 @@ export default function MonthlyTrends({ selectedYear = null }) {
                       >
                         <defs>
                           <linearGradient id={`minutesGradient-${year}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="rgba(30, 215, 96, 0.4)" />
-                            <stop offset="100%" stopColor="rgba(30, 215, 96, 0.1)" />
+                            <stop offset="0%" stopColor="rgba(30, 136, 229, 0.4)" />
+                            <stop offset="100%" stopColor="rgba(30, 136, 229, 0.1)" />
                           </linearGradient>
                         </defs>
                         
@@ -301,7 +302,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                         <path
                           d={minutesChart.linePath}
                           fill="none"
-                          stroke="rgb(30, 215, 96)"
+                          stroke="rgb(30, 136, 229)"
                           strokeWidth="2"
                           className="chart-line"
                         />
@@ -318,7 +319,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                                 cx={point.x}
                                 cy={point.y}
                                 r={isActive ? 6 : 4}
-                                fill="rgb(30, 215, 96)"
+                                fill="rgb(30, 136, 229)"
                                 stroke="rgba(40, 40, 40, 0.8)"
                                 strokeWidth="2"
                                 className="chart-point"
@@ -331,7 +332,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                                   y={point.y - 12}
                                   textAnchor="middle"
                                   className="point-label"
-                                  fill="#1ede60"
+                                  fill="#1e88e5"
                                   fontSize="10"
                                   fontWeight="600"
                                 >
@@ -467,13 +468,13 @@ export default function MonthlyTrends({ selectedYear = null }) {
                   <svg className="line-chart" viewBox={`0 0 ${minutesChart.chartWidth} ${minutesChart.chartHeight}`} preserveAspectRatio="xMidYMid meet">
                     <defs>
                       <linearGradient id="minutesGradientSingle" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="rgba(30, 215, 96, 0.4)" />
-                        <stop offset="100%" stopColor="rgba(30, 215, 96, 0.1)" />
+                        <stop offset="0%" stopColor="rgba(30, 136, 229, 0.4)" />
+                        <stop offset="100%" stopColor="rgba(30, 136, 229, 0.1)" />
                       </linearGradient>
                     </defs>
                     
                     <path d={minutesChart.areaPath} fill="url(#minutesGradientSingle)" className="chart-area" />
-                    <path d={minutesChart.linePath} fill="none" stroke="rgb(30, 215, 96)" strokeWidth="2" className="chart-line" />
+                    <path d={minutesChart.linePath} fill="none" stroke="rgb(30, 136, 229)" strokeWidth="2" className="chart-line" />
                     
                     {minutesChart.points.map((point, index) => {
                       const isActive = activeTooltip === index;
@@ -483,7 +484,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                             cx={point.x}
                             cy={point.y}
                             r={isActive ? 6 : 4}
-                            fill="rgb(30, 215, 96)"
+                            fill="rgb(30, 136, 229)"
                             stroke="rgba(40, 40, 40, 0.8)"
                             strokeWidth="2"
                             className="chart-point"
@@ -491,7 +492,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                             style={{ cursor: 'pointer' }}
                           />
                           {isActive && (
-                            <text x={point.x} y={point.y - 12} textAnchor="middle" className="point-label" fill="#1ede60" fontSize="10" fontWeight="600">
+                            <text x={point.x} y={point.y - 12} textAnchor="middle" className="point-label" fill="#1e88e5" fontSize="10" fontWeight="600">
                               {point.month.total_minutes.toLocaleString()}
                             </text>
                           )}
@@ -559,16 +560,89 @@ export default function MonthlyTrends({ selectedYear = null }) {
               {monthlyData.monthly_trends.reduce((sum, m) => sum + m.total_minutes, 0).toLocaleString()}
             </div>
           </div>
-          <div className="summary-stat">
-            <div className="stat-label">Peak Month</div>
-            <div className="stat-value">
-              {(() => {
-                const peakMonth = monthlyData.monthly_trends.reduce((max, m) => 
-                  m.stream_count > max.stream_count ? m : max, monthlyData.monthly_trends[0]);
-                return `${peakMonth.month_name}`;
-              })()}
+        </div>
+
+        {/* Listening Behavior Analysis */}
+        <div className="listening-analysis">
+          <button 
+            className="show-insights-btn"
+            onClick={() => setShowInsights(!showInsights)}
+          >
+            {showInsights ? 'Hide Analysis' : 'Show Listening Analysis'} 
+            <span className={`arrow ${showInsights ? 'up' : 'down'}`}>▼</span>
+          </button>
+          
+          {showInsights && (
+            <div className="insights-content">
+              <div className="insights-grid">
+                {/* Peak Comparison */}
+                {(() => {
+                  const peakByMinutes = monthlyData.peak_month?.by_minutes || 
+                    monthlyData.monthly_trends.reduce((max, m) => 
+                      m.total_minutes > max.total_minutes ? m : max, monthlyData.monthly_trends[0]);
+                  const peakByStreams = monthlyData.peak_month?.by_streams || 
+                    monthlyData.monthly_trends.reduce((max, m) => 
+                      m.stream_count > max.stream_count ? m : max, monthlyData.monthly_trends[0]);
+                  
+                  return (
+                    <div className="insight-card">
+                      <div className="insight-header">Peak Activity Comparison</div>
+                      <div className="peak-comparison">
+                        <div className="peak-item">
+                          <div className="peak-label">Most Minutes</div>
+                          <div className="peak-value">{peakByMinutes.month_name}</div>
+                          <div className="peak-detail">{peakByMinutes.total_minutes.toLocaleString()} min</div>
+                        </div>
+                        <div className="peak-item">
+                          <div className="peak-label">Most Streams</div>
+                          <div className="peak-value">{peakByStreams.month_name}</div>
+                          <div className="peak-detail">{peakByStreams.stream_count.toLocaleString()} streams</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+                
+                {/* Skip Behavior Analysis */}
+                {(() => {
+                  const avgMinutesPerStream = monthlyData.monthly_trends.map(m => ({
+                    month: m.month_name,
+                    avgPerStream: m.avg_minutes_per_stream
+                  }));
+                  
+                  const highest = avgMinutesPerStream.reduce((max, m) => m.avgPerStream > max.avgPerStream ? m : max);
+                  const lowest = avgMinutesPerStream.reduce((min, m) => m.avgPerStream < min.avgPerStream ? m : min);
+                  
+                  return (
+                    <div className="insight-card">
+                      <div className="insight-header">Listening Depth Analysis</div>
+                      <div className="listening-depth">
+                        <div className="depth-item">
+                          <div className="depth-label">Deepest Listening</div>
+                          <div className="depth-value">{highest.month}</div>
+                          <div className="depth-detail">{highest.avgPerStream} min/stream</div>
+                          <div className="depth-explanation">Longer sessions, fewer skips</div>
+                        </div>
+                        <div className="depth-item">
+                          <div className="depth-label">Most Exploratory</div>
+                          <div className="depth-value">{lowest.month}</div>
+                          <div className="depth-detail">{lowest.avgPerStream} min/stream</div>
+                          <div className="depth-explanation">Shorter sessions, more discovery</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+              
+              <div className="analysis-explanation">
+                <p>
+                  <strong>Understanding the metrics:</strong> Months with higher minutes but fewer streams suggest deeper listening sessions, 
+                  while months with more streams but fewer minutes indicate more exploratory behavior or playlist shuffling.
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
