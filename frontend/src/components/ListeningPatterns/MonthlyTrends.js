@@ -88,7 +88,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
       <div className="monthly-trends-container">
         <SectionTitle title="Monthly Listening Trends" />
         <div className="trends-loading">
-          Loading monthly trends{selectedYear ? ` for ${selectedYear}` : ''}...
+          Loading monthly patterns{selectedYear ? ` for ${selectedYear}` : ''}...
         </div>
       </div>
     );
@@ -97,7 +97,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
   if (error) {
     return (
       <div className="monthly-trends-container">
-        <div className="trends-error">Failed to load monthly trends: {error}</div>
+        <div className="trends-error">Failed to load monthly patterns: {error}</div>
       </div>
     );
   }
@@ -105,10 +105,10 @@ export default function MonthlyTrends({ selectedYear = null }) {
   if (!monthlyData?.monthly_trends || monthlyData.monthly_trends.length === 0) {
     return (
       <div className="monthly-trends-container">
-        <SectionTitle title="Monthly Listening Trends" />
+        <SectionTitle title="Monthly Listening Patterns" />
         <div className="trends-section">
           <p className="section-description">
-            Your listening activity by month{selectedYear && ` for ${selectedYear}`} - track patterns and seasonal preferences
+            Your listening activity by month{selectedYear && ` for ${selectedYear}`} - track patterns
           </p>
         </div>
         <div className="trends-error">
@@ -139,11 +139,11 @@ export default function MonthlyTrends({ selectedYear = null }) {
 
   return (
     <div className="monthly-trends-container">
-      <SectionTitle title="Monthly Listening Trends" />
+      <SectionTitle title="Monthly Listening Patterns" />
       
       <div className="trends-section">
         <p className="section-description">
-          Your listening activity by month{selectedYear && ` for ${selectedYear}`} - track patterns and seasonal preferences
+          Your listening activity by month{selectedYear && ` for ${selectedYear}`} - track patterns
         </p>
       </div>
 

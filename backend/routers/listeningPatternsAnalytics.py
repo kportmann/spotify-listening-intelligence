@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func, extract
+from sqlalchemy import func, extract, case
 from database.connection import get_db
 from database.schema import SpotifyStream
 
@@ -186,6 +186,167 @@ async def get_monthly_trends(year: int = None, timezone: str = "UTC", db: Sessio
                 'year': peak_month_by_streams['year'] if peak_month_by_streams else None,
                 'stream_count': peak_month_by_streams['stream_count'] if peak_month_by_streams else 0
             }
+        }
+    }
+
+
+@router.get("/skip-rate-analysis")
+async def get_skip_rate_analysis(year: int = None, timezone: str = "UTC", db: Session = Depends(get_db)):
+    """Get skip rate analysis showing skip patterns and statistics
+    
+    Args:
+        year: Optional year filter
+        timezone: Timezone for conversion (e.g., 'Europe/Zurich', 'America/New_York', 'UTC')
+    """
+    
+    # Base query for music tracks only
+    base_query = db.query(SpotifyStream).filter(
+        SpotifyStream.spotify_track_uri.isnot(None)
+    )
+    
+    if year:
+        base_query = base_query.filter(extract('year', SpotifyStream.ts) == year)
+    
+    # Convert timestamps to specified timezone for analysis
+    if timezone == "UTC":
+        ts_converted = SpotifyStream.ts
+    else:
+        ts_converted = func.timezone(timezone, SpotifyStream.ts)
+    
+    # Overall skip rate statistics
+    total_streams = base_query.count()
+    skipped_streams = base_query.filter(SpotifyStream.skipped == True).count()
+    skip_rate = (skipped_streams / total_streams * 100) if total_streams > 0 else 0
+    
+    # Skip rate by artist
+    artist_skip_data = base_query.with_entities(
+        SpotifyStream.master_metadata_album_artist_name.label('artist_name'),
+        func.count(SpotifyStream.id).label('total_streams'),
+        func.sum(case((SpotifyStream.skipped == True, 1), else_=0)).label('skipped_count')
+    ).filter(
+        SpotifyStream.master_metadata_album_artist_name.isnot(None)
+    ).group_by(
+        SpotifyStream.master_metadata_album_artist_name
+    ).having(
+        func.count(SpotifyStream.id) >= 5  # Only artists with 5+ streams
+    ).order_by(
+        func.count(SpotifyStream.id).desc()
+    ).limit(20).all()
+    
+    # Format artist data
+    artist_skip_rates = []
+    for row in artist_skip_data:
+        total = row.total_streams or 0
+        skipped = row.skipped_count or 0
+        skip_percentage = (skipped / total * 100) if total > 0 else 0
+        
+        artist_skip_rates.append({
+            'artist_name': row.artist_name,
+            'total_streams': total,
+            'skipped_count': skipped,
+            'skip_rate': round(skip_percentage, 1)
+        })
+    
+    # Skip rate by hour of day
+    hourly_skip_data = base_query.with_entities(
+        extract('hour', ts_converted).label('hour_of_day'),
+        func.count(SpotifyStream.id).label('total_streams'),
+        func.sum(case((SpotifyStream.skipped == True, 1), else_=0)).label('skipped_count')
+    ).group_by(
+        extract('hour', ts_converted)
+    ).order_by(
+        extract('hour', ts_converted)
+    ).all()
+    
+    # Format hourly data
+    hourly_skip_rates = []
+    for row in hourly_skip_data:
+        total = row.total_streams or 0
+        skipped = row.skipped_count or 0
+        skip_percentage = (skipped / total * 100) if total > 0 else 0
+        
+        hourly_skip_rates.append({
+            'hour': int(row.hour_of_day),
+            'total_streams': total,
+            'skipped_count': skipped,
+            'skip_rate': round(skip_percentage, 1)
+        })
+    
+    # Skip rate trends by month
+    monthly_skip_data = base_query.with_entities(
+        extract('year', ts_converted).label('year'),
+        extract('month', ts_converted).label('month'),
+        func.count(SpotifyStream.id).label('total_streams'),
+        func.sum(case((SpotifyStream.skipped == True, 1), else_=0)).label('skipped_count')
+    ).group_by(
+        extract('year', ts_converted),
+        extract('month', ts_converted)
+    ).order_by(
+        extract('year', ts_converted),
+        extract('month', ts_converted)
+    ).all()
+    
+    # Format monthly trends
+    monthly_skip_trends = []
+    month_names = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ]
+    
+    for row in monthly_skip_data:
+        total = row.total_streams or 0
+        skipped = row.skipped_count or 0
+        skip_percentage = (skipped / total * 100) if total > 0 else 0
+        
+        monthly_skip_trends.append({
+            'year': int(row.year),
+            'month': int(row.month),
+            'month_name': month_names[int(row.month) - 1],
+            'total_streams': total,
+            'skipped_count': skipped,
+            'skip_rate': round(skip_percentage, 1)
+        })
+    
+    # Skip reasons analysis
+    skip_reasons_data = base_query.filter(
+        SpotifyStream.skipped == True,
+        SpotifyStream.reason_end.isnot(None)
+    ).with_entities(
+        SpotifyStream.reason_end.label('reason'),
+        func.count(SpotifyStream.id).label('count')
+    ).group_by(
+        SpotifyStream.reason_end
+    ).order_by(
+        func.count(SpotifyStream.id).desc()
+    ).all()
+    
+    skip_reasons = [
+        {'reason': row.reason, 'count': row.count}
+        for row in skip_reasons_data
+    ]
+    
+    # Find most and least skipped artists
+    most_skipped_artist = max(artist_skip_rates, key=lambda x: x['skip_rate']) if artist_skip_rates else None
+    least_skipped_artist = min(artist_skip_rates, key=lambda x: x['skip_rate']) if artist_skip_rates else None
+    
+    # Find peak skip time
+    peak_skip_hour = max(hourly_skip_rates, key=lambda x: x['skip_rate']) if hourly_skip_rates else None
+    
+    return {
+        'overall_stats': {
+            'total_streams': total_streams,
+            'skipped_streams': skipped_streams,
+            'skip_rate': round(skip_rate, 1),
+            'completion_rate': round(100 - skip_rate, 1)
+        },
+        'artist_skip_rates': artist_skip_rates,
+        'hourly_skip_rates': hourly_skip_rates,
+        'monthly_skip_trends': monthly_skip_trends,
+        'skip_reasons': skip_reasons,
+        'insights': {
+            'most_skipped_artist': most_skipped_artist,
+            'least_skipped_artist': least_skipped_artist,
+            'peak_skip_hour': peak_skip_hour
         }
     }
 

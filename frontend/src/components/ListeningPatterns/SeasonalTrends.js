@@ -66,7 +66,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
       <div className="seasonal-trends-container">
         <SectionTitle title="Seasonal Listening Trends" />
         <div className="trends-loading">
-          Loading seasonal trends{selectedYear ? ` for ${selectedYear}` : ''}...
+          Loading seasonal patterns {selectedYear ? ` for ${selectedYear}` : ''}...
         </div>
       </div>
     );
@@ -75,7 +75,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
   if (error) {
     return (
       <div className="seasonal-trends-container">
-        <div className="trends-error">Failed to load seasonal trends: {error}</div>
+        <div className="trends-error">Failed to load seasonal patterns: {error}</div>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
   if (!seasonalData?.seasonal_trends || seasonalData.seasonal_trends.length === 0) {
     return (
       <div className="seasonal-trends-container">
-        <SectionTitle title="Seasonal Listening Trends" />
+        <SectionTitle title="Seasonal Listening Patterns" />
         <div className="trends-section">
           <p className="section-description">
             Your listening patterns across the four seasons{selectedYear && ` for ${selectedYear}`}
@@ -101,7 +101,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
 
   return (
     <div className="seasonal-trends-container">
-      <SectionTitle title="Seasonal Listening Trends" />
+      <SectionTitle title="Seasonal Listening Patterns" />
       
       <div className="trends-section">
         <p className="section-description">
