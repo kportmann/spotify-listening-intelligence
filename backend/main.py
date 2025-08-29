@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config.settings import get_settings
-from routers import basicAnalytics, musicAnalytics, podcastAnalytics
+from routers import basicAnalytics, musicAnalytics, podcastAnalytics, listeningPatternsAnalytics
 
 settings = get_settings()
 
@@ -22,6 +22,7 @@ app.add_middleware(
 app.include_router(basicAnalytics.router, prefix="/api/v1/basicStats", tags=["basicStats"])
 app.include_router(musicAnalytics.router, prefix="/api/v1/music", tags=["music"])
 app.include_router(podcastAnalytics.router, prefix="/api/v1/podcasts", tags=["podcasts"])
+app.include_router(listeningPatternsAnalytics.router, prefix="/api/v1/listening-patterns", tags=["listening-patterns"])
 
 @app.get("/")
 async def root():

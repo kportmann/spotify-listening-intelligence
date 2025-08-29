@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
 
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
   
   const menuItems = [
-    { label: 'Dashboard', active: true },
-    { label: 'Example1', active: false },
-    { label: 'Example2', active: false },
+    { label: 'Dashboard', path: '/', active: location.pathname === '/' },
+    { label: 'Listening Patterns', path: '/listening-patterns', active: location.pathname === '/listening-patterns' },
   ];
 
   const toggleSidebar = () => {
@@ -26,12 +27,13 @@ function Sidebar() {
       <div className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
         <nav className="nav-menu">
           {menuItems.map((item, index) => (
-            <div 
+            <Link 
               key={index} 
+              to={item.path}
               className={`nav-item ${item.active ? 'active' : ''}`}
             >
               {item.label}
-            </div>
+            </Link>
           ))}
         </nav>
       </div>
