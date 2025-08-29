@@ -86,7 +86,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
         <SectionTitle title="Seasonal Listening Trends" />
         <div className="trends-section">
           <p className="section-description">
-            Your listening patterns across the four seasons{selectedYear && ` for ${selectedYear}`} - discover how your music taste changes throughout the year
+            Your listening patterns across the four seasons{selectedYear && ` for ${selectedYear}`}
           </p>
         </div>
         <div className="trends-error">
@@ -105,7 +105,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
       
       <div className="trends-section">
         <p className="section-description">
-          Your listening patterns across the four seasons{selectedYear && ` for ${selectedYear}`} - discover how your music taste changes throughout the year
+          Your listening patterns across the four seasons{selectedYear && ` for ${selectedYear}`}
         </p>
       </div>
 
@@ -169,11 +169,6 @@ export default function SeasonalTrends({ selectedYear = null }) {
                     </div>
                   </>
                 )}
-
-                <div className="years-covered">
-                  <span className="years-label">Years covered: </span>
-                  <span className="years-value">{season.years_covered}</span>
-                </div>
               </div>
             </div>
           );

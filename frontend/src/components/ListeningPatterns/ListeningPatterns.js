@@ -5,18 +5,17 @@ import MonthlyTrends from './MonthlyTrends';
 import SeasonalTrends from './SeasonalTrends';
 import TimePeriodSelector from '../common/TimePeriodSelector/TimePeriodSelector';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
+import PageHeader from '../common/PageHeader/PageHeader';
 
 export default function ListeningPatterns() {
   const [selectedPeriod, setSelectedPeriod] = useState('all_time');
 
   return (
     <div className="listening-patterns-page">
-      <div className="listening-patterns-header">
-        <h1 className="page-title">Listening Patterns</h1>
-        <p className="page-description">
-          Discover your unique listening habits and explore detailed patterns in your music consumption.
-        </p>
-      </div>
+      <PageHeader 
+        title="Listening Patterns"
+        description="Discover your unique listening habits and explore detailed patterns in your music consumption."
+      />
 
       <TimePeriodSelector 
         selectedPeriod={selectedPeriod}
