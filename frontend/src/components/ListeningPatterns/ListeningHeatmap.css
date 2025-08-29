@@ -97,68 +97,44 @@
   margin-left: 0.5rem;
 }
 
-.heatmap-grid-container {
-  overflow-x: auto;
+.heatmap-section {
+  text-align: center;
   margin-bottom: 1.5rem;
 }
 
-.hour-labels {
-  display: flex;
-  margin-bottom: 0.5rem;
-}
-
-.hour-label-spacer {
-  width: 60px;
-  flex-shrink: 0;
-}
-
-.hour-label {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
+.section-description {
   color: #b3b3b3;
-  flex-shrink: 0;
+  font-size: 0.85rem;
+  margin: 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
 }
 
-.heatmap-grid {
+.circular-heatmap-container {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.heatmap-row {
-  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 2px;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  padding: 1rem;
 }
 
-.day-label {
-  width: 60px;
-  color: #ffffff;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-align: right;
-  padding-right: 0.5rem;
-  flex-shrink: 0;
+.circular-heatmap {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
-.heatmap-cell {
-  width: 20px;
-  height: 20px;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-  flex-shrink: 0;
+.heatmap-segment {
+  transition: stroke 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease;
 }
 
-.heatmap-cell:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(29, 185, 84, 0.4);
-  z-index: 10;
-  position: relative;
+.hour-label-text, .day-label-text, .center-label, .center-value {
+  user-select: none;
+  pointer-events: none;
 }
 
 .heatmap-legend {
@@ -253,24 +229,17 @@
     font-size: 0.8rem;
   }
 
-  .day-label {
-    width: 45px;
-    font-size: 0.7rem;
+  .circular-heatmap-container {
+    padding: 0.5rem;
   }
 
-  .hour-label-spacer {
-    width: 45px;
+  .circular-heatmap {
+    max-width: 350px;
   }
 
-  .heatmap-cell {
-    width: 16px;
-    height: 16px;
-  }
 
-  .hour-label {
-    width: 16px;
-    height: 16px;
-    font-size: 0.6rem;
+  .section-description {
+    font-size: 0.8rem;
   }
 
   .heatmap-summary {
@@ -280,23 +249,38 @@
 }
 
 @media (max-width: 480px) {
-  .heatmap-cell {
-    width: 12px;
-    height: 12px;
+  .heatmap-container {
+    padding: 0.75rem;
   }
 
-  .hour-label {
-    width: 12px;
-    height: 12px;
-    font-size: 0.5rem;
+  .circular-heatmap-container {
+    padding: 0.25rem;
   }
 
-  .day-label {
-    width: 35px;
-    font-size: 0.6rem;
+  .circular-heatmap {
+    max-width: 300px;
   }
 
-  .hour-label-spacer {
-    width: 35px;
+  .timezone-selector {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .peak-hour-info {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .heatmap-title {
+    font-size: 1.2rem;
+  }
+
+  .heatmap-description {
+    font-size: 0.75rem;
+  }
+
+
+  .section-description {
+    font-size: 0.75rem;
   }
 }

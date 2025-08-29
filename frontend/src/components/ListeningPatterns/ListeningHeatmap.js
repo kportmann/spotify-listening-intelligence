@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './ListeningHeatmap.css';
 import { listeningPatternsService } from '../../services/listeningPatternsService';
+import SectionTitle from '../common/SectionTitle/SectionTitle';
 
 export default function ListeningHeatmap({ selectedYear = null }) {
   const [heatmapData, setHeatmapData] = useState(null);
@@ -95,13 +96,15 @@ export default function ListeningHeatmap({ selectedYear = null }) {
 
   return (
     <div className="heatmap-container">
-      <div className="heatmap-header">
-        <h3 className="heatmap-title">Listening Activity Heatmap</h3>
-        <p className="heatmap-description">
-          Your listening patterns by day of week and time of day
-          {selectedYear && ` for ${selectedYear}`}
+      <SectionTitle title="Listening Activity Heatmap" />
+      
+      <div className="heatmap-section">
+        <p className="section-description">
+          Your listening patterns by day of week and time of day{selectedYear && ` for ${selectedYear}`} - each ring represents a day, segments show hourly activity
         </p>
-        
+      </div>
+
+      <div className="heatmap-header">
         <div className="timezone-selector">
           <label htmlFor="timezone-select" className="timezone-label">Timezone:</label>
           <select
@@ -128,41 +131,138 @@ export default function ListeningHeatmap({ selectedYear = null }) {
         </div>
       )}
 
-      <div className="heatmap-grid-container">
-        {/* Hour labels */}
-        <div className="hour-labels">
-          <div className="hour-label-spacer"></div>
-          {Array.from({ length: 24 }, (_, hour) => (
-            <div key={hour} className="hour-label" title={formatHour(hour)}>
-              {hour % 6 === 0 ? formatHour(hour) : ''}
-            </div>
-          ))}
-        </div>
+      <div className="circular-heatmap-container">
+        <svg className="circular-heatmap" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
+          {/* Hour labels around the outside */}
+          {Array.from({ length: 24 }, (_, hour) => {
+            const angle = (hour * 15 - 90) * Math.PI / 180; // 15 degrees per hour, start at top
+            const labelRadius = 180;
+            const x = 200 + Math.cos(angle) * labelRadius;
+            const y = 200 + Math.sin(angle) * labelRadius;
+            
+            return hour % 3 === 0 ? (
+              <text
+                key={`hour-${hour}`}
+                x={x}
+                y={y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="hour-label-text"
+                fontSize="10"
+                fill="#b3b3b3"
+              >
+                {formatHour(hour).replace(' ', '')}
+              </text>
+            ) : null;
+          })}
 
-        {/* Heatmap grid */}
-        <div className="heatmap-grid">
-          {heatmapData.day_names.map((day, dayIndex) => (
-            <div key={day} className="heatmap-row">
-              <div className="day-label">{day.substring(0, 3)}</div>
-              {heatmapData.heatmap_data[dayIndex].map((hourData, hourIndex) => (
-                <div
-                  key={`${day}-${hourIndex}`}
-                  className="heatmap-cell"
-                  style={{
-                    backgroundColor: getIntensityColor(
-                      hourData.stream_count,
-                      heatmapData.max_values.streams,
-                      'streams'
-                    )
-                  }}
-                  onMouseEnter={() => setHoveredCell({ day, hour: hourIndex, data: hourData })}
-                  onMouseLeave={() => setHoveredCell(null)}
-                  title={`${day} ${formatHour(hourIndex)}: ${hourData.stream_count} streams, ${hourData.total_minutes} min`}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+          {/* Day rings and hour segments */}
+          {heatmapData.day_names.map((day, dayIndex) => {
+            const innerRadius = 40 + dayIndex * 18;
+            const outerRadius = innerRadius + 16;
+            
+            return (
+              <g key={day}>
+                {/* Day label */}
+                <text
+                  x="200"
+                  y={200 - innerRadius - 8}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="day-label-text"
+                  fontSize="11"
+                  fill="#ffffff"
+                  fontWeight="500"
+                >
+                  {day.substring(0, 3)}
+                </text>
+
+                {/* Hour segments for this day */}
+                {heatmapData.heatmap_data[dayIndex].map((hourData, hourIndex) => {
+                  const startAngle = (hourIndex * 15 - 90) * Math.PI / 180;
+                  const endAngle = ((hourIndex + 1) * 15 - 90) * Math.PI / 180;
+                  
+                  const x1 = 200 + Math.cos(startAngle) * innerRadius;
+                  const y1 = 200 + Math.sin(startAngle) * innerRadius;
+                  const x2 = 200 + Math.cos(endAngle) * innerRadius;
+                  const y2 = 200 + Math.sin(endAngle) * innerRadius;
+                  const x3 = 200 + Math.cos(endAngle) * outerRadius;
+                  const y3 = 200 + Math.sin(endAngle) * outerRadius;
+                  const x4 = 200 + Math.cos(startAngle) * outerRadius;
+                  const y4 = 200 + Math.sin(startAngle) * outerRadius;
+                  
+                  const pathData = `M ${x1} ${y1} A ${innerRadius} ${innerRadius} 0 0 1 ${x2} ${y2} L ${x3} ${y3} A ${outerRadius} ${outerRadius} 0 0 0 ${x4} ${y4} Z`;
+                  
+                  return (
+                    <path
+                      key={`${day}-${hourIndex}`}
+                      d={pathData}
+                      fill={getIntensityColor(
+                        hourData.stream_count,
+                        heatmapData.max_values.streams,
+                        'streams'
+                      )}
+                      stroke="#282828"
+                      strokeWidth="0.5"
+                      className="heatmap-segment"
+                      onMouseEnter={(e) => {
+                        setHoveredCell({ day, hour: hourIndex, data: hourData });
+                        e.target.style.stroke = '#1db954';
+                        e.target.style.strokeWidth = '2';
+                        e.target.style.filter = 'drop-shadow(0 0 8px rgba(29, 185, 84, 0.6))';
+                      }}
+                      onMouseLeave={(e) => {
+                        setHoveredCell(null);
+                        e.target.style.stroke = '#282828';
+                        e.target.style.strokeWidth = '0.5';
+                        e.target.style.filter = 'none';
+                      }}
+                      style={{ 
+                        cursor: 'pointer',
+                        transition: 'stroke 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease'
+                      }}
+                    >
+                      <title>{`${day} ${formatHour(hourIndex)}: ${hourData.stream_count} streams, ${hourData.total_minutes} min`}</title>
+                    </path>
+                  );
+                })}
+              </g>
+            );
+          })}
+
+          {/* Center circle with summary info */}
+          <circle
+            cx="200"
+            cy="200"
+            r="35"
+            fill="#1a1a1a"
+            stroke="#3e3e3e"
+            strokeWidth="2"
+          />
+          <text
+            x="200"
+            y="195"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="center-label"
+            fontSize="9"
+            fill="#b3b3b3"
+          >
+            Total Streams
+          </text>
+          <text
+            x="200"
+            y="208"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="center-value"
+            fontSize="12"
+            fill="#1db954"
+            fontWeight="600"
+          >
+            {heatmapData.summary?.total_streams?.toLocaleString() || '0'}
+          </text>
+        </svg>
       </div>
 
       {/* Legend */}
@@ -178,15 +278,6 @@ export default function ListeningHeatmap({ selectedYear = null }) {
         <span className="legend-label">More</span>
       </div>
 
-      {/* Summary stats */}
-      {heatmapData.summary && (
-        <div className="heatmap-summary">
-          <div className="summary-stat">
-            <span className="stat-label">Total streams:</span>
-            <span className="stat-value">{heatmapData.summary.total_streams.toLocaleString()}</span>
-          </div>
-        </div>
-      )}
 
       {/* Tooltip */}
       {hoveredCell && (
