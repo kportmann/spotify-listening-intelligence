@@ -1,14 +1,13 @@
 services:
-  # Backend FastAPI Service
   backend:
     build:
       context: ./backend
     ports:
       - "${BACKEND_PORT}:8000"
     volumes:
-      - ./backend:/app  # Mount backend code for live reloading
-      - ./data:/data  # Mount data directory for streaming history files
-      - /app/__pycache__  # Prevent local pycache from overwriting container's
+      - ./backend:/app
+      - ./data:/data
+      - /app/__pycache__
     env_file:
       - .env
     depends_on:
@@ -22,10 +21,10 @@ services:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     volumes:
       - ./frontend:/app
-      - /app/node_modules # Prevents local node_modules from overwriting container's
+      - /app/node_modules
     environment:
-      - CHOKIDAR_USEPOLLING=true # Helps with file change detection in Docker
-    stdin_open: true # Required for Create React App dev server
+      - CHOKIDAR_USEPOLLING=true
+    stdin_open: true
     tty: true
 
   # PostgreSQL Database Service
