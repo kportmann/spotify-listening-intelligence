@@ -44,46 +44,6 @@
   color: #b3b3b3;
 }
 
-.year-selector {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.year-selector-label {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #ffffff;
-}
-
-.year-selector-dropdown {
-  background: #3e3e3e;
-  border: 1px solid #5e5e5e;
-  border-radius: 8px;
-  color: #ffffff;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-}
-
-.year-selector-dropdown:hover {
-  border-color: #1db954;
-}
-
-.year-selector-dropdown:focus {
-  outline: none;
-  border-color: #1db954;
-  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
-}
 
 .patterns-content {
   display: grid;
@@ -98,13 +58,6 @@
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
-.section-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
 
 .placeholder-content {
   text-align: center;
@@ -152,7 +105,4 @@
     padding: 1.5rem;
   }
   
-  .section-title {
-    font-size: 1.3rem;
-  }
 }

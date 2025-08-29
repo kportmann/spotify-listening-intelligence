@@ -1,35 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './ListeningPatterns.css';
 import ListeningHeatmap from './ListeningHeatmap';
-import { basicStatsService } from '../../services/basicStatsService';
+import TimePeriodSelector from '../common/TimePeriodSelector/TimePeriodSelector';
+import SectionTitle from '../common/SectionTitle/SectionTitle';
 
 export default function ListeningPatterns() {
-  const [availableYears, setAvailableYears] = useState([]);
-  const [selectedYear, setSelectedYear] = useState('all_time');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAvailableYears = async () => {
-      try {
-        const yearsData = await basicStatsService.getAvailableYears();
-        setAvailableYears(yearsData.years);
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch available years:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchAvailableYears();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="listening-patterns-page">
-        <div className="listening-patterns-loading">Loading...</div>
-      </div>
-    );
-  }
+  const [selectedPeriod, setSelectedPeriod] = useState('all_time');
 
   return (
     <div className="listening-patterns-page">
@@ -40,28 +16,16 @@ export default function ListeningPatterns() {
         </p>
       </div>
 
-      {availableYears.length > 0 && (
-        <div className="year-selector">
-          <label htmlFor="year-select" className="year-selector-label">Time Period:</label>
-          <select
-            id="year-select"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="year-selector-dropdown"
-          >
-            <option value="all_time">All Time</option>
-            {availableYears.map(year => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-        </div>
-      )}
+      <TimePeriodSelector 
+        selectedPeriod={selectedPeriod}
+        onPeriodChange={setSelectedPeriod}
+      />
 
       <div className="patterns-content">
-        <ListeningHeatmap selectedYear={selectedYear === 'all_time' ? null : parseInt(selectedYear)} />
+        <ListeningHeatmap selectedYear={selectedPeriod === 'all_time' ? null : parseInt(selectedPeriod)} />
         
         <div className="pattern-section">
-          <h2 className="section-title">More Patterns Coming Soon</h2>
+          <SectionTitle title="More Patterns Coming Soon" />
           <div className="placeholder-content">
             <p>Additional listening pattern analysis will be available here soon!</p>
             <p>Future features will include:</p>

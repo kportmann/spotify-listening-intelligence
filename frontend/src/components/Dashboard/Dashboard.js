@@ -4,7 +4,7 @@ import HeroStats from './HeroStats';
 import StatsGrid from './StatsGrid';
 import TopMusic from './TopMusic';
 import TopPodcasts from './TopPodcasts';
-import TimePeriodSelector from './TimePeriodSelector';
+import TimePeriodSelector from '../common/TimePeriodSelector/TimePeriodSelector';
 import WannaSeeMore from './WannaSeeMore';
 
 export default function Dashboard() {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { basicStatsService } from '../../services/basicStatsService';
+import { basicStatsService } from '../../../services/basicStatsService';
 import './TimePeriodSelector.css';
 
 export default function TimePeriodSelector({ selectedPeriod, onPeriodChange }) {
