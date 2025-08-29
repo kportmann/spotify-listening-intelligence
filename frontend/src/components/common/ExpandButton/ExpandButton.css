@@ -1,0 +1,54 @@
+.expand-button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.expand-btn {
+  border: none;
+  border-radius: 25px;
+  padding: 0.75rem 2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.expand-btn--expand {
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+}
+
+.expand-btn--expand:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+  background: linear-gradient(135deg, #1ed760 0%, #21e065 100%);
+}
+
+.expand-btn--collapse {
+  background: #444444;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.expand-btn--collapse:hover:not(:disabled) {
+  background: #555555;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.expand-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .expand-btn {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}

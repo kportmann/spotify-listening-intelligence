@@ -1,4 +1,5 @@
 import StatCard from '../common/StatCard/StatCard';
+import SectionTitle from '../common/SectionTitle/SectionTitle';
 import './StatsGrid.css';
 
 export default function StatsGrid({ stats, period = 'all_time' }) {
@@ -14,7 +15,7 @@ export default function StatsGrid({ stats, period = 'all_time' }) {
 
   return (
     <div className="stats-section">
-      <h2 className="stats-header">Quick Stats - Music</h2>
+      <SectionTitle title="Quick Stats - Music" />
       <div className="stats-grid">
         <StatCard 
           title="Music Hours" 

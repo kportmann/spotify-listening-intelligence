@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import SectionTitle from '../common/SectionTitle/SectionTitle';
 import './WannaSeeMore.css';
 
 export default function WannaSeeMore() {
@@ -10,7 +11,7 @@ export default function WannaSeeMore() {
 
   return (
     <div className="wanna-see-more">
-      <div className="wanna-see-more-label">Wanna see more?</div>
+      <SectionTitle title="Wanna see more?" />
       <div className="wanna-see-more-buttons">
         <button
           className="see-more-btn"

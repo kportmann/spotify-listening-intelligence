@@ -2,26 +2,6 @@
   margin-bottom: 3rem;
 }
 
-.top-music-header {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0 0 2rem 0;
-  text-align: center;
-  position: relative;
-}
-
-.top-music-header::after {
-  content: '';
-  position: absolute;
-  bottom: -0.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
-  border-radius: 2px;
-}
 
 .top-music-grid {
   display: grid;
@@ -36,10 +16,6 @@
     margin-bottom: 2rem;
   }
   
-  .top-music-header {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
   
   .top-music-grid {
     gap: 1.5rem;

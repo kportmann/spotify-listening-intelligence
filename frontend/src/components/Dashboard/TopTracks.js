@@ -3,6 +3,7 @@ import { useTopContent } from '../../hooks/useTopContent';
 import { musicService } from '../../services/musicService';
 import TopContentCarousel from './TopContentCarousel';
 import ExpandableTopList from './ExpandableTopList';
+import ExpandButton from '../common/ExpandButton/ExpandButton';
 import './TopTracks.css';
 
 export default function TopTracks({ period = 'all_time', limit = 100 }) {
@@ -78,15 +79,11 @@ export default function TopTracks({ period = 'all_time', limit = 100 }) {
             title="Top Tracks"
           />
           
-          <div className="carousel-actions">
-            <button 
-              onClick={toggleExpanded}
-              className="show-more-btn"
-              disabled={loadingImages}
-            >
-              {loadingImages ? 'Loading...' : 'Show More'}
-            </button>
-          </div>
+          <ExpandButton 
+            isExpanded={false}
+            onClick={toggleExpanded}
+            isLoading={loadingImages}
+          />
         </>
       ) : (
         <>
@@ -97,14 +94,10 @@ export default function TopTracks({ period = 'all_time', limit = 100 }) {
             loadingImages={loadingImages}
           />
           
-          <div className="carousel-actions">
-            <button 
-              onClick={toggleExpanded}
-              className="show-less-btn"
-            >
-              Show Less
-            </button>
-          </div>
+          <ExpandButton 
+            isExpanded={true}
+            onClick={toggleExpanded}
+          />
         </>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { useTopContent } from '../../hooks/useTopContent';
 import TopContentList from './TopContentList';
+import SectionTitle from '../common/SectionTitle/SectionTitle';
 import './TopPodcasts.css';
 
 export default function TopPodcasts({ period = 'all_time', limit = 5 }) {
@@ -27,7 +28,7 @@ export default function TopPodcasts({ period = 'all_time', limit = 5 }) {
 
   return (
     <div className="top-content-section">
-      <h2 className="top-content-header">Your Top Podcasts</h2>
+      <SectionTitle title="Your Top Podcasts" />
       <div className="top-content-grid">
         {data.episodes && data.episodes.length > 0 && (
           <TopContentList 
