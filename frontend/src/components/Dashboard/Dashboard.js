@@ -10,6 +10,7 @@ import WannaSeeMore from './WannaSeeMore';
 export default function Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('all_time');
   const { stats, loading, error } = useAnalytics(selectedPeriod);
+  const { stats: allTimeStats } = useAnalytics('all_time');
 
   if (loading) {
     return <div className="dashboard-loading">Loading dashboard...</div>;
@@ -21,7 +22,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      <HeroStats stats={stats} />
+      <HeroStats stats={allTimeStats} />
       
       <TimePeriodSelector 
         selectedPeriod={selectedPeriod}
