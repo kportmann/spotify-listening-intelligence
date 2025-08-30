@@ -42,35 +42,9 @@ export default function TopContentList({
         return (
           <div key={index} className="top-content-item">
             <span className="rank">#{index + 1}</span>
-            {item.image_url ? (
+            {item.image_url && (
               <div className="artist-image">
-                <img 
-                  src={item.image_url} 
-                  alt={item.artist_name}
-                  onError={(e) => {
-                    console.log(`[TopContentList Debug] Failed to load artist image:`, {
-                      artist: item.artist_name,
-                      rank: index + 1,
-                      imageUrl: item.image_url,
-                      error: e
-                    });
-                    e.target.style.display = 'none';
-                  }}
-                  onLoad={() => {
-                    console.log(`[TopContentList Debug] Successfully loaded artist image:`, {
-                      artist: item.artist_name,
-                      rank: index + 1
-                    });
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="artist-image-placeholder" style={{width: '50px', height: '50px', backgroundColor: '#ccc', borderRadius: '50%'}}>
-                {console.log(`[TopContentList Debug] Artist missing image_url:`, {
-                  artist: item.artist_name,
-                  rank: index + 1,
-                  image_url: item.image_url
-                })}
+                <img src={item.image_url} alt={item.artist_name} />
               </div>
             )}
             <div className="content-info">
@@ -84,38 +58,9 @@ export default function TopContentList({
         return (
           <div key={index} className="top-content-item">
             <span className="rank">#{index + 1}</span>
-            {item.image_url ? (
+            {item.image_url && (
               <div className="track-image">
-                <img 
-                  src={item.image_url} 
-                  alt={`${item.track_name} by ${item.artist_name}`}
-                  onError={(e) => {
-                    console.log(`[TopContentList Debug] Failed to load track image:`, {
-                      track: item.track_name,
-                      artist: item.artist_name,
-                      rank: index + 1,
-                      imageUrl: item.image_url,
-                      error: e
-                    });
-                    e.target.style.display = 'none';
-                  }}
-                  onLoad={() => {
-                    console.log(`[TopContentList Debug] Successfully loaded track image:`, {
-                      track: item.track_name,
-                      artist: item.artist_name,
-                      rank: index + 1
-                    });
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="track-image-placeholder" style={{width: '50px', height: '50px', backgroundColor: '#ccc'}}>
-                {console.log(`[TopContentList Debug] Track missing image_url:`, {
-                  track: item.track_name,
-                  artist: item.artist_name,
-                  rank: index + 1,
-                  image_url: item.image_url
-                })}
+                <img src={item.image_url} alt={`${item.track_name} by ${item.artist_name}`} />
               </div>
             )}
             <div className="content-info">
