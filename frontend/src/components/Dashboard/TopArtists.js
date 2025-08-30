@@ -19,6 +19,47 @@ export default function TopArtists({ period = 'all_time', limit = 100 }) {
       
       try {
         const artistsData = await musicService.getTopArtistsWithImages(period, limit);
+        
+        // Debug: Log image loading statistics
+        const totalArtists = artistsData.length;
+        const artistsWithImages = artistsData.filter(artist => artist.image_url).length;
+        const artistsWithoutImages = artistsData.filter(artist => !artist.image_url);
+        const successRate = (artistsWithImages / totalArtists) * 100;
+        
+        console.log(`[TopArtists Debug] Image loading stats:`, {
+          total: totalArtists,
+          withImages: artistsWithImages,
+          withoutImages: totalArtists - artistsWithImages,
+          successRate: `${successRate.toFixed(1)}%`
+        });
+        
+        // Auto-retry with cache refresh if success rate is too low
+        if (successRate < 60 && !loadArtistsWithImages._retried) {
+          console.log(`[TopArtists Debug] Low success rate (${successRate.toFixed(1)}%), retrying with cache refresh...`);
+          loadArtistsWithImages._retried = true;
+          
+          try {
+            const retryData = await musicService.getTopArtistsWithImages(period, limit, true);
+            const retrySuccess = (retryData.filter(artist => artist.image_url).length / retryData.length) * 100;
+            console.log(`[TopArtists Debug] Retry success rate: ${retrySuccess.toFixed(1)}%`);
+            setArtists(retryData);
+            return;
+          } catch (retryError) {
+            console.error('Retry failed:', retryError);
+          }
+        }
+        
+        // Log first few artists without images for investigation
+        if (artistsWithoutImages.length > 0) {
+          console.log(`[TopArtists Debug] Artists without images:`, 
+            artistsWithoutImages.slice(0, 5).map(artist => ({
+              name: artist.artist_name,
+              rank: artistsData.indexOf(artist) + 1,
+              image_url: artist.image_url
+            }))
+          );
+        }
+        
         setArtists(artistsData);
       } catch (err) {
         console.error('Failed to load artists with images:', err);

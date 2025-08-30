@@ -55,12 +55,36 @@ class SpotifyService:
         self.base_url = "https://api.spotify.com/v1"
         self.auth_url = "https://accounts.spotify.com/api/token"
         
-        # Simple in-memory cache with 15-minute TTL
+        # Simple in-memory cache with 15-minute TTL for successful results
+        # Null results get shorter TTL to allow retries
         self._cache: Dict[str, Dict[str, Any]] = {}
-        self._cache_ttl = 15 * 60  # 15 minutes in seconds
+        self._cache_ttl = 15 * 60  # 15 minutes in seconds for successful results
+        self._null_cache_ttl = 5 * 60  # 5 minutes for null results
         
         if not all([self.client_id, self.client_secret, self.redirect_uri]):
             raise ValueError("Missing Spotify API credentials in environment variables")
+    
+    def clear_null_caches(self) -> None:
+        """Clear all cached null results to force retry"""
+        keys_to_remove = []
+        for key, entry in self._cache.items():
+            if entry["data"] is None:
+                keys_to_remove.append(key)
+        
+        for key in keys_to_remove:
+            del self._cache[key]
+        
+        print(f"Cleared {len(keys_to_remove)} null cache entries")
+    
+    def get_cache_stats(self) -> Dict[str, int]:
+        """Get cache statistics for debugging"""
+        total_entries = len(self._cache)
+        null_entries = sum(1 for entry in self._cache.values() if entry["data"] is None)
+        return {
+            "total_entries": total_entries,
+            "null_entries": null_entries,
+            "valid_entries": total_entries - null_entries
+        }
     
     def _get_cache_key(self, prefix: str, identifier: str) -> str:
         """Generate cache key for storing API responses"""
@@ -68,10 +92,17 @@ class SpotifyService:
     
     def _is_cache_valid(self, cache_entry: Dict[str, Any]) -> bool:
         """Check if cache entry is still valid (within TTL)"""
-        return time.time() - cache_entry["timestamp"] < self._cache_ttl
+        # Use shorter TTL for null results to allow retries
+        ttl = self._null_cache_ttl if cache_entry["data"] is None else self._cache_ttl
+        return time.time() - cache_entry["timestamp"] < ttl
     
-    def _get_from_cache(self, cache_key: str) -> Optional[Any]:
+    def _get_from_cache(self, cache_key: str, refresh_cache: bool = False) -> Optional[Any]:
         """Get item from cache if valid"""
+        if refresh_cache and cache_key in self._cache:
+            # Force refresh by removing from cache
+            del self._cache[cache_key]
+            return None
+            
         if cache_key in self._cache:
             entry = self._cache[cache_key]
             if self._is_cache_valid(entry):
@@ -109,11 +140,11 @@ class SpotifyService:
             
             return response.json()["access_token"]
     
-    async def search_artist(self, artist_name: str) -> Optional[SpotifyArtist]:
+    async def search_artist(self, artist_name: str, refresh_cache: bool = False) -> Optional[SpotifyArtist]:
         """Search for artist and return artist data with images"""
         # Check cache first
         cache_key = self._get_cache_key("artist", artist_name.lower())
-        cached_result = self._get_from_cache(cache_key)
+        cached_result = self._get_from_cache(cache_key, refresh_cache)
         if cached_result is not None:
             return cached_result
         
@@ -183,11 +214,11 @@ class SpotifyService:
                 popularity=artist["popularity"]
             )
     
-    async def search_track(self, track_name: str, artist_name: str) -> Optional[SpotifyTrack]:
+    async def search_track(self, track_name: str, artist_name: str, refresh_cache: bool = False) -> Optional[SpotifyTrack]:
         """Search for track and return track data with album artwork"""
         # Check cache first
         cache_key = self._get_cache_key("track", f"{track_name}|{artist_name}".lower())
-        cached_result = self._get_from_cache(cache_key)
+        cached_result = self._get_from_cache(cache_key, refresh_cache)
         if cached_result is not None:
             return cached_result
         

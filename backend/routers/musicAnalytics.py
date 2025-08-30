@@ -65,7 +65,8 @@ async def get_top_artists(
     db: Session = Depends(get_db),
     period: Optional[str] = Query("all_time", description="Time period: 7d, 1m, 3m, 6m, 1y, all_time, or year (e.g., 2024)"),
     limit: Optional[int] = Query(50, description="Number of results to return"),
-    include_images: Optional[bool] = Query(False, description="Include artist images from Spotify API")
+    include_images: Optional[bool] = Query(False, description="Include artist images from Spotify API"),
+    refresh_cache: Optional[bool] = Query(False, description="Force refresh of cached image data")
 ):
     """Get top artists by listening time"""
     
@@ -109,9 +110,19 @@ async def get_top_artists(
     
     # Only fetch images if explicitly requested
     if include_images:
+        # Smart cache refresh: if too many items lack images, clear null caches
+        if not refresh_cache:
+            cache_stats = spotify_service.get_cache_stats()
+            if cache_stats["total_entries"] > 10 and cache_stats["null_entries"] > cache_stats["total_entries"] * 0.4:
+                print(f"High null cache ratio ({cache_stats['null_entries']}/{cache_stats['total_entries']}), clearing null caches")
+                spotify_service.clear_null_caches()
+        
         for artist_data in artist_data_list:
             try:
-                spotify_artist = await spotify_service.search_artist(artist_data["artist_name"])
+                spotify_artist = await spotify_service.search_artist(
+                    artist_data["artist_name"], 
+                    refresh_cache=refresh_cache
+                )
                 if spotify_artist and spotify_artist.images:
                     # Get medium size image (usually index 1) or first available
                     image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
@@ -128,7 +139,8 @@ async def get_top_tracks(
     db: Session = Depends(get_db),
     period: Optional[str] = Query("all_time", description="Time period: 7d, 1m, 3m, 6m, 1y, all_time, or year (e.g., 2024)"),
     limit: Optional[int] = Query(50, description="Number of results to return"),
-    include_images: Optional[bool] = Query(False, description="Include album artwork from Spotify API")
+    include_images: Optional[bool] = Query(False, description="Include album artwork from Spotify API"),
+    refresh_cache: Optional[bool] = Query(False, description="Force refresh of cached image data")
 ):
     """Get top tracks by listening time"""
     
@@ -178,9 +190,20 @@ async def get_top_tracks(
     
     # Only fetch images if explicitly requested
     if include_images:
+        # Smart cache refresh: if too many items lack images, clear null caches
+        if not refresh_cache:
+            cache_stats = spotify_service.get_cache_stats()
+            if cache_stats["total_entries"] > 10 and cache_stats["null_entries"] > cache_stats["total_entries"] * 0.4:
+                print(f"High null cache ratio ({cache_stats['null_entries']}/{cache_stats['total_entries']}), clearing null caches")
+                spotify_service.clear_null_caches()
+        
         for track_data in track_data_list:
             try:
-                spotify_track = await spotify_service.search_track(track_data["track_name"], track_data["artist_name"])
+                spotify_track = await spotify_service.search_track(
+                    track_data["track_name"], 
+                    track_data["artist_name"], 
+                    refresh_cache=refresh_cache
+                )
                 if spotify_track and spotify_track.album_images:
                     # Get medium size image (usually index 1) or first available
                     image_url = spotify_track.album_images[1].url if len(spotify_track.album_images) > 1 else spotify_track.album_images[0].url
@@ -192,6 +215,16 @@ async def get_top_tracks(
     
     return track_data_list
 
+@router.get("/cache/stats")
+async def get_cache_stats():
+    """Get cache statistics for debugging"""
+    return spotify_service.get_cache_stats()
+
+@router.post("/cache/clear-null")
+async def clear_null_caches():
+    """Clear all cached null image results to force retry"""
+    spotify_service.clear_null_caches()
+    return {"message": "Null cache entries cleared", "stats": spotify_service.get_cache_stats()}
 
 def _get_cutoff_date(period: str) -> Optional[datetime]:
     """Helper function to calculate cutoff date based on period"""

@@ -78,10 +78,6 @@
   transition: transform 0.2s ease;
 }
 
-.artist-image img:hover {
-  transform: scale(1.05);
-}
-
 .track-image {
   width: 40px;
   height: 40px;
@@ -95,10 +91,6 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.2s ease;
-}
-
-.track-image img:hover {
-  transform: scale(1.05);
 }
 
 .episode-image {
