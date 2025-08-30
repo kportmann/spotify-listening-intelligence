@@ -49,5 +49,13 @@ export const musicService = {
       artists,
       tracks
     };
+  },
+
+  async getTopArtistsWithImages(period = 'all_time', limit = 100) {
+    return this.getTopArtists(period, limit, true);
+  },
+
+  async getTopTracksWithImages(period = 'all_time', limit = 100) {
+    return this.getTopTracks(period, limit, true);
   }
 };

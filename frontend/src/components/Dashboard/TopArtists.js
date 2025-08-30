@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useTopContent } from '../../hooks/useTopContent';
 import { musicService } from '../../services/musicService';
 import TopContentCarousel from './TopContentCarousel';
 import ExpandableTopList from './ExpandableTopList';
@@ -7,45 +6,34 @@ import ExpandButton from '../common/ExpandButton/ExpandButton';
 import './TopArtists.css';
 
 export default function TopArtists({ period = 'all_time', limit = 100 }) {
-  const { data, loading, error } = useTopContent(period, limit);
-  const [itemsWithImages, setItemsWithImages] = useState([]);
-  const [loadingImages, setLoadingImages] = useState(false);
+  const [artists, setArtists] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showExpanded, setShowExpanded] = useState(false);
 
-  // Load images for artists
+  // Load artists with images included
   useEffect(() => {
-    if (!data?.artists) return;
-
-    const loadImagesForArtists = async () => {
-      setLoadingImages(true);
+    const loadArtistsWithImages = async () => {
+      setLoading(true);
+      setError(null);
       
       try {
-        // Load images for more items when expanded, otherwise just top 10
-        const itemsToLoad = showExpanded ? 40 : 10;
-        const artistsToLoad = data.artists.slice(0, itemsToLoad).map(a => a.artist_name);
-        const imageData = await musicService.getImagesForContent(artistsToLoad, []);
-        
-        const updatedArtists = data.artists.map(artist => ({
-          ...artist,
-          image_url: imageData.artist_images?.[artist.artist_name] || null
-        }));
-        
-        setItemsWithImages(updatedArtists);
-      } catch (error) {
-        console.error('Failed to load artist images:', error);
+        const artistsData = await musicService.getTopArtistsWithImages(period, limit);
+        setArtists(artistsData);
+      } catch (err) {
+        console.error('Failed to load artists with images:', err);
+        setError(err);
       } finally {
-        setLoadingImages(false);
+        setLoading(false);
       }
     };
 
-    loadImagesForArtists();
-  }, [data, showExpanded]);
+    loadArtistsWithImages();
+  }, [period, limit]);
 
   const toggleExpanded = () => {
     setShowExpanded(!showExpanded);
   };
-
-  const hasImages = itemsWithImages.length > 0;
 
   if (loading) {
     return (
@@ -55,7 +43,7 @@ export default function TopArtists({ period = 'all_time', limit = 100 }) {
     );
   }
 
-  if (error || !data?.artists) {
+  if (error || !artists.length) {
     return (
       <div className="top-artists-section">
         <div className="top-artists-error">Unable to load artists data</div>
@@ -63,15 +51,12 @@ export default function TopArtists({ period = 'all_time', limit = 100 }) {
     );
   }
 
-  // Use progressive data if available, otherwise fall back to basic data
-  const displayData = hasImages ? itemsWithImages : data.artists;
-
   return (
     <div className="top-artists-section">
       {!showExpanded ? (
         <>
           <TopContentCarousel 
-            items={displayData}
+            items={artists}
             type="artists"
             title="Top Artists"
           />
@@ -79,16 +64,16 @@ export default function TopArtists({ period = 'all_time', limit = 100 }) {
           <ExpandButton 
             isExpanded={false}
             onClick={toggleExpanded}
-            isLoading={loadingImages}
+            isLoading={false}
           />
         </>
       ) : (
         <>
           <ExpandableTopList
-            items={displayData}
+            items={artists}
             type="artists"
             title="All Top Artists"
-            loadingImages={loadingImages}
+            loadingImages={false}
           />
           
           <ExpandButton 
