@@ -7,24 +7,15 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
   const [skipData, setSkipData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedTimezone, setSelectedTimezone] = useState('Europe/Zurich');
   const [activeView, setActiveView] = useState('overview');
 
-  const timezoneOptions = [
-    { value: 'UTC', label: 'UTC' },
-    { value: 'Europe/Zurich', label: 'Europe/Zurich (CET/CEST)' },
-    { value: 'America/New_York', label: 'America/New_York (EST/EDT)' },
-    { value: 'America/Los_Angeles', label: 'America/Los_Angeles (PST/PDT)' },
-    { value: 'Asia/Bangkok', label: 'Asia/Bangkok (ICT)' },
-    { value: 'Asia/Tokyo', label: 'Asia/Tokyo (JST)' },
-  ];
 
   useEffect(() => {
     const fetchSkipData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await listeningPatternsService.getSkipRateAnalysis(selectedYear, selectedTimezone);
+        const data = await listeningPatternsService.getSkipRateAnalysis(selectedYear);
         setSkipData(data);
       } catch (err) {
         console.error('Failed to fetch skip rate data:', err);
@@ -35,14 +26,8 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
     };
 
     fetchSkipData();
-  }, [selectedYear, selectedTimezone]);
+  }, [selectedYear]);
 
-  const formatHour = (hour) => {
-    if (hour === 0) return '12 AM';
-    if (hour < 12) return `${hour} AM`;
-    if (hour === 12) return '12 PM';
-    return `${hour - 12} PM`;
-  };
 
   const getSkipRateColor = (skipRate) => {
     if (skipRate <= 10) return '#1db954'; // Green - low skip rate
@@ -61,27 +46,27 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
       <div className="skip-overview">
         <div className="skip-stats-grid">
           <div className="skip-stat-card">
-            <div className="stat-value" style={{ color: getSkipRateColor(overall_stats.skip_rate) }}>
+            <div className="skip-stat-value" style={{ color: getSkipRateColor(overall_stats.skip_rate) }}>
               {overall_stats.skip_rate}%
             </div>
-            <div className="stat-label">Skip Rate</div>
-            <div className="stat-detail">{overall_stats.skipped_streams.toLocaleString()} skipped</div>
+            <div className="skip-stat-label">Skip Rate</div>
+            <div className="skip-stat-detail">{overall_stats.skipped_streams.toLocaleString()} skipped</div>
           </div>
 
           <div className="skip-stat-card">
-            <div className="stat-value" style={{ color: '#1db954' }}>
+            <div className="skip-stat-value" style={{ color: '#1db954' }}>
               {overall_stats.completion_rate}%
             </div>
-            <div className="stat-label">Completion Rate</div>
-            <div className="stat-detail">{(overall_stats.total_streams - overall_stats.skipped_streams).toLocaleString()} completed</div>
+            <div className="skip-stat-label">Completion Rate</div>
+            <div className="skip-stat-detail">{(overall_stats.total_streams - overall_stats.skipped_streams).toLocaleString()} completed</div>
           </div>
 
           <div className="skip-stat-card">
-            <div className="stat-value">
+            <div className="skip-stat-value">
               {overall_stats.total_streams.toLocaleString()}
             </div>
-            <div className="stat-label">Total Streams</div>
-            <div className="stat-detail">analyzed</div>
+            <div className="skip-stat-label">Total Streams</div>
+            <div className="skip-stat-detail">analyzed</div>
           </div>
         </div>
 
@@ -105,13 +90,6 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
                 </div>
               )}
 
-              {insights.peak_skip_hour && (
-                <div className="insight-card">
-                  <div className="insight-title">Peak Skip Time</div>
-                  <div className="insight-value">{formatHour(insights.peak_skip_hour.hour)}</div>
-                  <div className="insight-detail">{insights.peak_skip_hour.skip_rate}% skip rate</div>
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -119,75 +97,171 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
     );
   };
 
-  const renderHourlyChart = () => {
-    if (!skipData?.hourly_skip_rates) return null;
 
-    const maxSkipRate = Math.max(...skipData.hourly_skip_rates.map(d => d.skip_rate));
-    const chartHeight = 200;
-    const chartWidth = 600;
-    const barWidth = 20;
-    const spacing = 25;
+  const renderMostSkippedTracks = () => {
+    if (!skipData?.track_skip_rates || skipData.track_skip_rates.length === 0) {
+      return (
+        <div className="tracks-analysis">
+          <h4>Most Skipped Tracks</h4>
+          <div className="no-data-message">
+            <p>No track skip data available.</p>
+            <p>This requires tracks with multiple listens to generate meaningful statistics.</p>
+          </div>
+        </div>
+      );
+    }
 
     return (
-      <div className="hourly-skip-chart">
-        <h4>Skip Rate by Hour of Day</h4>
-        <svg width={chartWidth} height={chartHeight + 60} className="skip-chart-svg">
-          {/* Grid lines */}
-          {[0, 25, 50, 75, 100].map(value => (
-            <g key={value}>
-              <line
-                x1="40"
-                y1={chartHeight - (value / 100) * chartHeight + 20}
-                x2={chartWidth - 20}
-                y2={chartHeight - (value / 100) * chartHeight + 20}
-                stroke="#333"
-                strokeDasharray="2,2"
-              />
-              <text
-                x="35"
-                y={chartHeight - (value / 100) * chartHeight + 25}
-                textAnchor="end"
-                fontSize="10"
-                fill="#888"
-              >
-                {value}%
-              </text>
-            </g>
-          ))}
+      <div className="tracks-analysis">
+        <h4>Most Skipped Tracks</h4>
+        <div className="tracks-table-container">
+          <table className="tracks-table">
+            <thead>
+              <tr>
+                <th>Track</th>
+                <th>Artist</th>
+                <th>Times Skipped</th>
+                <th>Skip Rate</th>
+                <th>Avg Skip Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              {skipData.track_skip_rates.slice(0, 20).map((track, index) => (
+                <tr key={index}>
+                  <td className="track-name">{track.track_name}</td>
+                  <td className="artist-name">{track.artist_name}</td>
+                  <td>{track.skip_count}</td>
+                  <td style={{ color: getSkipRateColor(track.skip_rate) }}>
+                    {track.skip_rate}%
+                  </td>
+                  <td>{track.avg_skip_position}s</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
 
-          {/* Bars */}
-          {skipData.hourly_skip_rates.map((data, index) => {
-            const barHeight = (data.skip_rate / 100) * chartHeight;
-            const x = 50 + index * spacing;
-            const y = chartHeight - barHeight + 20;
+  const renderMostCompletedTracks = () => {
+    if (!skipData?.completed_tracks || skipData.completed_tracks.length === 0) {
+      return (
+        <div className="tracks-analysis">
+          <h4>Most Completed Tracks</h4>
+          <div className="no-data-message">
+            <p>No track completion data available.</p>
+            <p>This requires tracks with multiple listens to generate meaningful statistics.</p>
+          </div>
+        </div>
+      );
+    }
 
-            return (
-              <g key={data.hour}>
-                <rect
-                  x={x}
-                  y={y}
-                  width={barWidth}
-                  height={barHeight}
-                  fill={getSkipRateColor(data.skip_rate)}
-                  className="skip-bar"
-                >
-                  <title>{`${formatHour(data.hour)}: ${data.skip_rate}% skip rate (${data.skipped_count}/${data.total_streams})`}</title>
-                </rect>
-                {index % 2 === 0 && (
-                  <text
-                    x={x + barWidth / 2}
-                    y={chartHeight + 40}
-                    textAnchor="middle"
-                    fontSize="9"
-                    fill="#888"
-                  >
-                    {data.hour}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-        </svg>
+    return (
+      <div className="tracks-analysis">
+        <h4>Most Completed Tracks</h4>
+        <div className="tracks-table-container">
+          <table className="tracks-table">
+            <thead>
+              <tr>
+                <th>Track</th>
+                <th>Artist</th>
+                <th>Times Played</th>
+                <th>Completion Rate</th>
+                <th>Avg Listen %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {skipData.completed_tracks.slice(0, 20).map((track, index) => (
+                <tr key={index}>
+                  <td className="track-name">{track.track_name}</td>
+                  <td className="artist-name">{track.artist_name}</td>
+                  <td>{track.play_count}</td>
+                  <td style={{ color: '#1db954' }}>
+                    {track.completion_rate}%
+                  </td>
+                  <td>{track.avg_listen_percentage}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAdvancedInsights = () => {
+    if (!skipData) return null;
+
+    const { overall_stats, artist_skip_rates, skip_reasons } = skipData;
+
+    return (
+      <div className="advanced-insights">
+        <h4>Skip Behavior Insights</h4>
+        
+        <div className="insights-section">
+          <div className="insight-category">
+            <h5>Listening Patterns</h5>
+            <div className="insights-grid">
+              <div className="insight-card">
+                <div className="insight-title">Skip Tendency</div>
+                <div className="insight-value" style={{ color: getSkipRateColor(overall_stats.skip_rate) }}>
+                  {overall_stats.skip_rate < 20 ? 'Low Skipper' : 
+                   overall_stats.skip_rate < 40 ? 'Moderate Skipper' : 
+                   overall_stats.skip_rate < 60 ? 'Frequent Skipper' : 'High Skipper'}
+                </div>
+                <div className="insight-detail">Based on {overall_stats.skip_rate}% skip rate</div>
+              </div>
+
+              <div className="insight-card">
+                <div className="insight-title">Most Patient With</div>
+                <div className="insight-value">
+                  {artist_skip_rates.length > 0 ? 
+                    artist_skip_rates.reduce((min, artist) => 
+                      artist.skip_rate < min.skip_rate ? artist : min
+                    ).artist_name : 'N/A'}
+                </div>
+                <div className="insight-detail">Lowest skip rate artist</div>
+              </div>
+
+              <div className="insight-card">
+                <div className="insight-title">Least Patient With</div>
+                <div className="insight-value">
+                  {artist_skip_rates.length > 0 ? 
+                    artist_skip_rates.reduce((max, artist) => 
+                      artist.skip_rate > max.skip_rate ? artist : max
+                    ).artist_name : 'N/A'}
+                </div>
+                <div className="insight-detail">Highest skip rate artist</div>
+              </div>
+            </div>
+          </div>
+
+          {skip_reasons && skip_reasons.length > 0 && (
+            <div className="insight-category">
+              <h5>Why You Skip</h5>
+              <div className="skip-reasons-analysis">
+                {skip_reasons.slice(0, 5).map((reason, index) => (
+                  <div key={reason.reason} className="reason-analysis-item">
+                    <span className="reason-name">{reason.reason}</span>
+                    <div className="reason-stats">
+                      <span className="reason-count">{reason.count} times</span>
+                      <div className="reason-bar">
+                        <div 
+                          className="reason-fill"
+                          style={{
+                            width: `${(reason.count / skip_reasons[0].count) * 100}%`,
+                            backgroundColor: '#ff6b35'
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -246,93 +320,6 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
     );
   };
 
-  const renderMonthlyTrend = () => {
-    if (!skipData?.monthly_skip_trends) return null;
-
-    const chartHeight = 180;
-    const chartWidth = 800;
-    const data = skipData.monthly_skip_trends;
-    
-    if (data.length === 0) return null;
-
-    const maxSkipRate = Math.max(...data.map(d => d.skip_rate));
-    const pointSpacing = (chartWidth - 100) / Math.max(data.length - 1, 1);
-
-    return (
-      <div className="monthly-trend-chart">
-        <h4>Skip Rate Trend Over Time</h4>
-        <svg width={chartWidth} height={chartHeight + 80} className="trend-chart-svg">
-          {/* Grid lines */}
-          {[0, 25, 50, 75, 100].map(value => (
-            <g key={value}>
-              <line
-                x1="50"
-                y1={chartHeight - (value / 100) * chartHeight + 20}
-                x2={chartWidth - 20}
-                y2={chartHeight - (value / 100) * chartHeight + 20}
-                stroke="#333"
-                strokeDasharray="2,2"
-              />
-              <text
-                x="45"
-                y={chartHeight - (value / 100) * chartHeight + 25}
-                textAnchor="end"
-                fontSize="10"
-                fill="#888"
-              >
-                {value}%
-              </text>
-            </g>
-          ))}
-
-          {/* Line and points */}
-          <g>
-            <polyline
-              points={data.map((d, i) => {
-                const x = 50 + i * pointSpacing;
-                const y = chartHeight - (d.skip_rate / 100) * chartHeight + 20;
-                return `${x},${y}`;
-              }).join(' ')}
-              fill="none"
-              stroke="#1db954"
-              strokeWidth="2"
-            />
-
-            {data.map((d, index) => {
-              const x = 50 + index * pointSpacing;
-              const y = chartHeight - (d.skip_rate / 100) * chartHeight + 20;
-
-              return (
-                <g key={index}>
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r="4"
-                    fill={getSkipRateColor(d.skip_rate)}
-                    className="trend-point"
-                  >
-                    <title>{`${d.month_name} ${d.year}: ${d.skip_rate}% skip rate`}</title>
-                  </circle>
-                  {index % Math.ceil(data.length / 8) === 0 && (
-                    <text
-                      x={x}
-                      y={chartHeight + 50}
-                      textAnchor="middle"
-                      fontSize="9"
-                      fill="#888"
-                      transform={`rotate(-45, ${x}, ${chartHeight + 50})`}
-                    >
-                      {d.month_name.substring(0, 3)} {d.year}
-                    </text>
-                  )}
-                </g>
-              );
-            })}
-          </g>
-        </svg>
-      </div>
-    );
-  };
 
   if (loading) {
     return (
@@ -369,22 +356,6 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
       </div>
 
       <div className="skip-header">
-        <div className="timezone-selector">
-          <label htmlFor="skip-timezone-select" className="timezone-label">Timezone:</label>
-          <select
-            id="skip-timezone-select"
-            value={selectedTimezone}
-            onChange={(e) => setSelectedTimezone(e.target.value)}
-            className="timezone-dropdown"
-          >
-            {timezoneOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div className="view-selector">
           <button
             className={`view-btn ${activeView === 'overview' ? 'active' : ''}`}
@@ -393,31 +364,38 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
             Overview
           </button>
           <button
-            className={`view-btn ${activeView === 'hourly' ? 'active' : ''}`}
-            onClick={() => setActiveView('hourly')}
-          >
-            By Hour
-          </button>
-          <button
             className={`view-btn ${activeView === 'artists' ? 'active' : ''}`}
             onClick={() => setActiveView('artists')}
           >
             By Artist
           </button>
           <button
-            className={`view-btn ${activeView === 'trends' ? 'active' : ''}`}
-            onClick={() => setActiveView('trends')}
+            className={`view-btn ${activeView === 'skipped-tracks' ? 'active' : ''}`}
+            onClick={() => setActiveView('skipped-tracks')}
           >
-            Trends
+            Most Skipped
+          </button>
+          <button
+            className={`view-btn ${activeView === 'completed-tracks' ? 'active' : ''}`}
+            onClick={() => setActiveView('completed-tracks')}
+          >
+            Most Completed
+          </button>
+          <button
+            className={`view-btn ${activeView === 'insights' ? 'active' : ''}`}
+            onClick={() => setActiveView('insights')}
+          >
+            Insights
           </button>
         </div>
       </div>
 
       <div className="skip-content">
         {activeView === 'overview' && renderOverviewStats()}
-        {activeView === 'hourly' && renderHourlyChart()}
         {activeView === 'artists' && renderArtistTable()}
-        {activeView === 'trends' && renderMonthlyTrend()}
+        {activeView === 'skipped-tracks' && renderMostSkippedTracks()}
+        {activeView === 'completed-tracks' && renderMostCompletedTracks()}
+        {activeView === 'insights' && renderAdvancedInsights()}
       </div>
 
       {skipData.skip_reasons && skipData.skip_reasons.length > 0 && (

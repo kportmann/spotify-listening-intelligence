@@ -149,16 +149,6 @@ export default function MonthlyTrends({ selectedYear = null }) {
 
       <div className="trends-chart-container">
         <div className="chart-header">
-          <div className="chart-metrics">
-            <div className="metric">
-              <span className="metric-label">Streams</span>
-              <div className="metric-legend streams-legend"></div>
-            </div>
-            <div className="metric">
-              <span className="metric-label">Minutes</span>
-              <div className="metric-legend minutes-legend"></div>
-            </div>
-          </div>
         </div>
 
         {isAllTime ? (

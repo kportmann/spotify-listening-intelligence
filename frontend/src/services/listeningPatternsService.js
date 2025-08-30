@@ -43,10 +43,9 @@ export const listeningPatternsService = {
     return response.json();
   },
 
-  async getSkipRateAnalysis(year = null, timezone = 'UTC') {
+  async getSkipRateAnalysis(year = null) {
     const params = new URLSearchParams();
     if (year) params.append('year', year);
-    params.append('timezone', timezone);
     
     const url = `${API_BASE_URL}/listening-patterns/skip-rate-analysis${params.toString() ? '?' + params.toString() : ''}`;
     
