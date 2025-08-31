@@ -40,16 +40,22 @@ export default function MonthlyTrends({ selectedYear = null }) {
   };
 
   const createLineChart = (data, maxValue, type = 'streams') => {
-    const chartWidth = 320;
+    const chartWidth = 360;
     const chartHeight = 120;
-    const padding = 20;
-    const innerWidth = chartWidth - 2 * padding;
-    const innerHeight = chartHeight - 2 * padding;
+    const leftPadding = 50;
+    const rightPadding = 20;
+    const topPadding = 20;
+    const bottomPadding = 25;
+    const innerWidth = chartWidth - leftPadding - rightPadding;
+    const innerHeight = chartHeight - topPadding - bottomPadding;
+
+    // Add 10% buffer to maxValue to ensure highest points aren't cut off
+    const scaledMaxValue = maxValue * 1.1;
 
     const points = data.map((month, index) => {
-      const x = padding + (index / Math.max(1, data.length - 1)) * innerWidth;
+      const x = leftPadding + (index / Math.max(1, data.length - 1)) * innerWidth;
       const value = type === 'streams' ? month.stream_count : month.total_minutes;
-      const y = chartHeight - padding - ((value || 0) / maxValue) * innerHeight;
+      const y = chartHeight - bottomPadding - ((value || 0) / scaledMaxValue) * innerHeight;
       return { x, y, value, month };
     });
 
@@ -60,10 +66,39 @@ export default function MonthlyTrends({ selectedYear = null }) {
 
     // Create area path (line + bottom)
     const areaPath = linePath + 
-      ` L ${points[points.length - 1]?.x || padding} ${chartHeight - padding}` +
-      ` L ${padding} ${chartHeight - padding} Z`;
+      ` L ${points[points.length - 1]?.x || leftPadding} ${chartHeight - bottomPadding}` +
+      ` L ${leftPadding} ${chartHeight - bottomPadding} Z`;
 
-    return { points, linePath, areaPath, chartWidth, chartHeight };
+    // Helper function to round up to next multiple of 10
+    const roundToNext10 = (value) => {
+      if (value === 0) return 0;
+      return Math.ceil(value / 10) * 10;
+    };
+
+    // Create y-axis grid lines and labels using original maxValue for labels
+    const yAxisSteps = 4;
+    const yGridLines = [];
+    const yLabels = [];
+    
+    for (let i = 0; i <= yAxisSteps; i++) {
+      const y = chartHeight - bottomPadding - (i / yAxisSteps) * innerHeight;
+      const rawValue = (i / yAxisSteps) * maxValue;
+      const roundedValue = roundToNext10(rawValue);
+      
+      yGridLines.push({
+        y,
+        x1: leftPadding,
+        x2: chartWidth - rightPadding
+      });
+      
+      yLabels.push({
+        y: y + 4,
+        x: leftPadding - 8,
+        value: roundedValue.toLocaleString()
+      });
+    }
+
+    return { points, linePath, areaPath, chartWidth, chartHeight, yGridLines, yLabels };
   };
 
   const formatMonth = (monthName) => {
@@ -185,13 +220,41 @@ export default function MonthlyTrends({ selectedYear = null }) {
                         viewBox={`0 0 ${streamsChart.chartWidth} ${streamsChart.chartHeight}`}
                         preserveAspectRatio="xMidYMid meet"
                       >
-                        {/* Grid lines */}
                         <defs>
                           <linearGradient id={`streamsGradient-${year}`} x1="0%" y1="0%" x2="0%" y2="100%">
                             <stop offset="0%" stopColor="rgba(29, 185, 84, 0.4)" />
                             <stop offset="100%" stopColor="rgba(29, 185, 84, 0.1)" />
                           </linearGradient>
                         </defs>
+                        
+                        {/* Y-axis grid lines */}
+                        {streamsChart.yGridLines.map((gridLine, index) => (
+                          <line
+                            key={`y-grid-${index}`}
+                            x1={gridLine.x1}
+                            y1={gridLine.y}
+                            x2={gridLine.x2}
+                            y2={gridLine.y}
+                            stroke="rgba(255, 255, 255, 0.1)"
+                            strokeWidth="1"
+                            strokeDasharray={index === 0 ? "none" : "2,2"}
+                          />
+                        ))}
+                        
+                        {/* Y-axis labels */}
+                        {streamsChart.yLabels.map((label, index) => (
+                          <text
+                            key={`y-label-${index}`}
+                            x={label.x}
+                            y={label.y}
+                            textAnchor="end"
+                            className="y-axis-label"
+                            fill="rgba(255, 255, 255, 0.6)"
+                            fontSize="8"
+                          >
+                            {label.value}
+                          </text>
+                        ))}
                         
                         {/* Area fill */}
                         <path
@@ -251,7 +314,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                           <text
                             key={`${year}-month-${index}`}
                             x={point.x}
-                            y={streamsChart.chartHeight - 5}
+                            y={streamsChart.chartHeight - 8}
                             textAnchor="middle"
                             className="month-label"
                             fill="#b3b3b3"
@@ -280,6 +343,35 @@ export default function MonthlyTrends({ selectedYear = null }) {
                             <stop offset="100%" stopColor="rgba(30, 136, 229, 0.1)" />
                           </linearGradient>
                         </defs>
+                        
+                        {/* Y-axis grid lines */}
+                        {minutesChart.yGridLines.map((gridLine, index) => (
+                          <line
+                            key={`y-grid-${index}`}
+                            x1={gridLine.x1}
+                            y1={gridLine.y}
+                            x2={gridLine.x2}
+                            y2={gridLine.y}
+                            stroke="rgba(255, 255, 255, 0.1)"
+                            strokeWidth="1"
+                            strokeDasharray={index === 0 ? "none" : "2,2"}
+                          />
+                        ))}
+                        
+                        {/* Y-axis labels */}
+                        {minutesChart.yLabels.map((label, index) => (
+                          <text
+                            key={`y-label-${index}`}
+                            x={label.x}
+                            y={label.y}
+                            textAnchor="end"
+                            className="y-axis-label"
+                            fill="rgba(255, 255, 255, 0.6)"
+                            fontSize="8"
+                          >
+                            {label.value}
+                          </text>
+                        ))}
                         
                         {/* Area fill */}
                         <path
@@ -338,7 +430,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                           <text
                             key={`${year}-month-${index}`}
                             x={point.x}
-                            y={minutesChart.chartHeight - 5}
+                            y={minutesChart.chartHeight - 8}
                             textAnchor="middle"
                             className="month-label"
                             fill="#b3b3b3"
@@ -414,6 +506,35 @@ export default function MonthlyTrends({ selectedYear = null }) {
                       </linearGradient>
                     </defs>
                     
+                    {/* Y-axis grid lines */}
+                    {streamsChart.yGridLines.map((gridLine, index) => (
+                      <line
+                        key={`y-grid-${index}`}
+                        x1={gridLine.x1}
+                        y1={gridLine.y}
+                        x2={gridLine.x2}
+                        y2={gridLine.y}
+                        stroke="rgba(255, 255, 255, 0.1)"
+                        strokeWidth="1"
+                        strokeDasharray={index === 0 ? "none" : "2,2"}
+                      />
+                    ))}
+                    
+                    {/* Y-axis labels */}
+                    {streamsChart.yLabels.map((label, index) => (
+                      <text
+                        key={`y-label-${index}`}
+                        x={label.x}
+                        y={label.y}
+                        textAnchor="end"
+                        className="y-axis-label"
+                        fill="rgba(255, 255, 255, 0.6)"
+                        fontSize="8"
+                      >
+                        {label.value}
+                      </text>
+                    ))}
+                    
                     <path d={streamsChart.areaPath} fill="url(#streamsGradientSingle)" className="chart-area" />
                     <path d={streamsChart.linePath} fill="none" stroke="rgb(29, 185, 84)" strokeWidth="2" className="chart-line" />
                     
@@ -442,7 +563,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                     })}
                     
                     {streamsChart.points.map((point, index) => (
-                      <text key={`month-${index}`} x={point.x} y={streamsChart.chartHeight - 5} textAnchor="middle" className="month-label" fill="#b3b3b3" fontSize="9">
+                      <text key={`month-${index}`} x={point.x} y={streamsChart.chartHeight - 8} textAnchor="middle" className="month-label" fill="#b3b3b3" fontSize="9">
                         {formatMonth(point.month.month_name)}
                       </text>
                     ))}
@@ -462,6 +583,35 @@ export default function MonthlyTrends({ selectedYear = null }) {
                         <stop offset="100%" stopColor="rgba(30, 136, 229, 0.1)" />
                       </linearGradient>
                     </defs>
+                    
+                    {/* Y-axis grid lines */}
+                    {minutesChart.yGridLines.map((gridLine, index) => (
+                      <line
+                        key={`y-grid-${index}`}
+                        x1={gridLine.x1}
+                        y1={gridLine.y}
+                        x2={gridLine.x2}
+                        y2={gridLine.y}
+                        stroke="rgba(255, 255, 255, 0.1)"
+                        strokeWidth="1"
+                        strokeDasharray={index === 0 ? "none" : "2,2"}
+                      />
+                    ))}
+                    
+                    {/* Y-axis labels */}
+                    {minutesChart.yLabels.map((label, index) => (
+                      <text
+                        key={`y-label-${index}`}
+                        x={label.x}
+                        y={label.y}
+                        textAnchor="end"
+                        className="y-axis-label"
+                        fill="rgba(255, 255, 255, 0.6)"
+                        fontSize="8"
+                      >
+                        {label.value}
+                      </text>
+                    ))}
                     
                     <path d={minutesChart.areaPath} fill="url(#minutesGradientSingle)" className="chart-area" />
                     <path d={minutesChart.linePath} fill="none" stroke="rgb(30, 136, 229)" strokeWidth="2" className="chart-line" />
@@ -491,7 +641,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                     })}
                     
                     {minutesChart.points.map((point, index) => (
-                      <text key={`month-${index}`} x={point.x} y={minutesChart.chartHeight - 5} textAnchor="middle" className="month-label" fill="#b3b3b3" fontSize="9">
+                      <text key={`month-${index}`} x={point.x} y={minutesChart.chartHeight - 8} textAnchor="middle" className="month-label" fill="#b3b3b3" fontSize="9">
                         {formatMonth(point.month.month_name)}
                       </text>
                     ))}
