@@ -4,6 +4,7 @@ from sqlalchemy import func, desc, extract
 from database.connection import get_db
 from database.schema import SpotifyStream
 from services.spotify_service import spotify_service
+from services.spotify_batch_service import spotify_batch_service
 from typing import Optional, List
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
@@ -180,17 +181,33 @@ async def get_top_shows(
     
     # Only fetch images if explicitly requested
     if include_images:
-        for show_data in show_data_list:
-            try:
-                spotify_show = await spotify_service.search_show(show_data["show_name"])
-                if spotify_show and spotify_show.images:
-                    # Get medium size image (usually index 1) or first available
-                    image_url = spotify_show.images[1].url if len(spotify_show.images) > 1 else spotify_show.images[0].url
-                    show_data["image_url"] = image_url
-            except Exception as e:
-                # Continue without image if Spotify API fails
-                print(f"Failed to fetch image for show {show_data['show_name']}: {e}")
-                pass
+        try:
+            # Use batch show lookup by names - combines individual searches with batch API
+            show_names = [show_data["show_name"] for show_data in show_data_list]
+            batch_shows = await spotify_service.get_shows_batch_by_names(show_names)
+            
+            # Enhance show data with images from batch results
+            for show_data in show_data_list:
+                show_name = show_data["show_name"]
+                if show_name in batch_shows:
+                    spotify_show = batch_shows[show_name]
+                    if spotify_show.images:
+                        # Get medium size image (usually index 1) or first available
+                        image_url = spotify_show.images[1].url if len(spotify_show.images) > 1 else spotify_show.images[0].url
+                        show_data["image_url"] = image_url
+        
+        except Exception as e:
+            print(f"Batch show fetching failed, falling back to individual searches: {e}")
+            # Fallback to individual searches if batch fails
+            for show_data in show_data_list:
+                try:
+                    spotify_show = await spotify_service.search_show(show_data["show_name"])
+                    if spotify_show and spotify_show.images:
+                        image_url = spotify_show.images[1].url if len(spotify_show.images) > 1 else spotify_show.images[0].url
+                        show_data["image_url"] = image_url
+                except Exception as e2:
+                    print(f"Failed to fetch image for show {show_data['show_name']}: {e2}")
+                    pass
     
     return show_data_list
 

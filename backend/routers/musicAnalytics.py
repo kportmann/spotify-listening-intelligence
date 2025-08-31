@@ -4,6 +4,7 @@ from sqlalchemy import func, desc, extract
 from database.connection import get_db
 from database.schema import SpotifyStream
 from services.spotify_service import spotify_service
+from services.spotify_batch_service import spotify_batch_service
 from typing import Optional, List
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
@@ -110,27 +111,36 @@ async def get_top_artists(
     
     # Only fetch images if explicitly requested
     if include_images:
-        # Smart cache refresh: if too many items lack images, clear null caches
-        if not refresh_cache:
-            cache_stats = spotify_service.get_cache_stats()
-            if cache_stats["total_entries"] > 10 and cache_stats["null_entries"] > cache_stats["total_entries"] * 0.4:
-                print(f"High null cache ratio ({cache_stats['null_entries']}/{cache_stats['total_entries']}), clearing null caches")
-                spotify_service.clear_null_caches()
+        try:
+            # Use batch artist lookup by names - combines individual searches with batch API
+            artist_names = [artist_data["artist_name"] for artist_data in artist_data_list]
+            batch_artists = await spotify_service.get_artists_batch_by_names(artist_names)
+            
+            # Enhance artist data with images from batch results
+            for artist_data in artist_data_list:
+                artist_name = artist_data["artist_name"]
+                if artist_name in batch_artists:
+                    spotify_artist = batch_artists[artist_name]
+                    if spotify_artist.images:
+                        # Get medium size image (usually index 1) or first available
+                        image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
+                        artist_data["image_url"] = image_url
         
-        for artist_data in artist_data_list:
-            try:
-                spotify_artist = await spotify_service.search_artist(
-                    artist_data["artist_name"], 
-                    refresh_cache=refresh_cache
-                )
-                if spotify_artist and spotify_artist.images:
-                    # Get medium size image (usually index 1) or first available
-                    image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
-                    artist_data["image_url"] = image_url
-            except Exception as e:
-                # Continue without image if Spotify API fails
-                print(f"Failed to fetch image for artist {artist_data['artist_name']}: {e}")
-                pass
+        except Exception as e:
+            print(f"Batch artist fetching failed, falling back to individual searches: {e}")
+            # Fallback to individual searches if batch fails
+            for artist_data in artist_data_list:
+                try:
+                    spotify_artist = await spotify_service.search_artist(
+                        artist_data["artist_name"], 
+                        refresh_cache=refresh_cache
+                    )
+                    if spotify_artist and spotify_artist.images:
+                        image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
+                        artist_data["image_url"] = image_url
+                except Exception as e2:
+                    print(f"Failed to fetch image for artist {artist_data['artist_name']}: {e2}")
+                    pass
     
     return artist_data_list
 
@@ -148,6 +158,7 @@ async def get_top_tracks(
         SpotifyStream.master_metadata_track_name.label('track_name'),
         SpotifyStream.master_metadata_album_artist_name.label('artist_name'),
         SpotifyStream.master_metadata_album_album_name.label('album_name'),
+        SpotifyStream.spotify_track_uri.label('track_uri'),
         func.sum(SpotifyStream.ms_played).label('total_ms'),
         func.count(SpotifyStream.id).label('play_count')
     ).filter(
@@ -169,13 +180,16 @@ async def get_top_tracks(
     results = query.group_by(
         SpotifyStream.master_metadata_track_name,
         SpotifyStream.master_metadata_album_artist_name,
-        SpotifyStream.master_metadata_album_album_name
+        SpotifyStream.master_metadata_album_album_name,
+        SpotifyStream.spotify_track_uri
     ).order_by(
         desc('total_ms')
     ).limit(limit).all()
     
     # Basic track data (fast)
     track_data_list = []
+    track_uris = []
+    
     for result in results:
         track_data = {
             "track_name": result.track_name,
@@ -184,34 +198,51 @@ async def get_top_tracks(
             "total_ms": result.total_ms,
             "total_hours": round(result.total_ms / (1000 * 60 * 60), 1),
             "play_count": result.play_count,
+            "track_uri": result.track_uri,
             "image_url": None
         }
         track_data_list.append(track_data)
+        if result.track_uri:
+            track_uris.append(result.track_uri)
     
     # Only fetch images if explicitly requested
     if include_images:
-        # Smart cache refresh: if too many items lack images, clear null caches
-        if not refresh_cache:
-            cache_stats = spotify_service.get_cache_stats()
-            if cache_stats["total_entries"] > 10 and cache_stats["null_entries"] > cache_stats["total_entries"] * 0.4:
-                print(f"High null cache ratio ({cache_stats['null_entries']}/{cache_stats['total_entries']}), clearing null caches")
-                spotify_service.clear_null_caches()
+        try:
+            # Use batch API to get track data from URIs - MUCH FASTER!
+            batch_tracks = await spotify_batch_service.get_tracks_from_uris(track_uris)
+            
+            # Create lookup map: URI -> SpotifyTrack
+            track_lookup = {f"spotify:track:{track.id}": track for track in batch_tracks}
+            
+            # Enhance track data with images from batch results
+            for track_data in track_data_list:
+                if track_data["track_uri"] in track_lookup:
+                    spotify_track = track_lookup[track_data["track_uri"]]
+                    if spotify_track.album_images:
+                        # Get medium size image (usually index 1) or first available
+                        image_url = spotify_track.album_images[1].url if len(spotify_track.album_images) > 1 else spotify_track.album_images[0].url
+                        track_data["image_url"] = image_url
         
-        for track_data in track_data_list:
-            try:
-                spotify_track = await spotify_service.search_track(
-                    track_data["track_name"], 
-                    track_data["artist_name"], 
-                    refresh_cache=refresh_cache
-                )
-                if spotify_track and spotify_track.album_images:
-                    # Get medium size image (usually index 1) or first available
-                    image_url = spotify_track.album_images[1].url if len(spotify_track.album_images) > 1 else spotify_track.album_images[0].url
-                    track_data["image_url"] = image_url
-            except Exception as e:
-                # Continue without image if Spotify API fails
-                print(f"Failed to fetch image for track {track_data['track_name']} by {track_data['artist_name']}: {e}")
-                pass
+        except Exception as e:
+            print(f"Batch track fetching failed, falling back to individual searches: {e}")
+            # Fallback to individual searches if batch fails
+            for track_data in track_data_list:
+                try:
+                    spotify_track = await spotify_service.search_track(
+                        track_data["track_name"], 
+                        track_data["artist_name"], 
+                        refresh_cache=refresh_cache
+                    )
+                    if spotify_track and spotify_track.album_images:
+                        image_url = spotify_track.album_images[1].url if len(spotify_track.album_images) > 1 else spotify_track.album_images[0].url
+                        track_data["image_url"] = image_url
+                except Exception as e2:
+                    print(f"Failed to fetch image for track {track_data['track_name']}: {e2}")
+                    pass
+    
+    # Remove track_uri from response (internal use only)
+    for track_data in track_data_list:
+        track_data.pop("track_uri", None)
     
     return track_data_list
 
