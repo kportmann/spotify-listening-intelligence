@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './MonthlyTrends.css';
 import { listeningPatternsService } from '../../services/listeningPatternsService';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
+import SectionDescription from '../common/SectionDescription/SectionDescription';
 
 export default function MonthlyTrends({ selectedYear = null }) {
   const [monthlyData, setMonthlyData] = useState(null);
@@ -142,9 +143,9 @@ export default function MonthlyTrends({ selectedYear = null }) {
       <div className="monthly-trends-container">
         <SectionTitle title="Monthly Listening Patterns" />
         <div className="monthly-section">
-          <p className="monthly-description">
+          <SectionDescription>
             Your listening activity by month{selectedYear && ` for ${selectedYear}`} - track patterns
-          </p>
+          </SectionDescription>
         </div>
         <div className="monthly-error">
           No monthly data available{selectedYear ? ` for ${selectedYear}` : ''}. 

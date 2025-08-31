@@ -19,11 +19,6 @@
   margin-bottom: 0.5rem;
 }
 
-.heatmap-description {
-  color: #b3b3b3;
-  font-size: 0.9rem;
-  margin: 0 0 1rem 0;
-}
 
 .timezone-selector {
   display: flex;
@@ -102,15 +97,6 @@
   margin-bottom: 1.5rem;
 }
 
-.heatmap-description {
-  color: #b3b3b3;
-  font-size: 0.85rem;
-  margin: 0;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.4;
-}
 
 .circular-heatmap-container {
   display: flex;
@@ -225,9 +211,6 @@
     font-size: 1.3rem;
   }
 
-  .heatmap-description {
-    font-size: 0.8rem;
-  }
 
   .circular-heatmap-container {
     padding: 0.5rem;
@@ -238,9 +221,6 @@
   }
 
 
-  .heatmap-description {
-    font-size: 0.8rem;
-  }
 
   .heatmap-summary {
     flex-direction: column;
@@ -275,12 +255,6 @@
     font-size: 1.2rem;
   }
 
-  .heatmap-description {
-    font-size: 0.75rem;
-  }
 
 
-  .heatmap-description {
-    font-size: 0.75rem;
-  }
 }

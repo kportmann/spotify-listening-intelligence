@@ -27,15 +27,6 @@
   margin-bottom: 1.5rem;
 }
 
-.monthly-description {
-  color: #b3b3b3;
-  font-size: 0.85rem;
-  margin: 0;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.4;
-}
 
 .trends-chart-container {
   margin-bottom: 2rem;
@@ -668,10 +659,6 @@
     font-size: 1.1rem;
   }
 
-  .monthly-description {
-    font-size: 0.8rem;
-    line-height: 1.5;
-  }
 
   /* Improve scroll indicator on mobile */
   .monthly-chart::after {
@@ -813,10 +800,6 @@
     padding: 1rem;
   }
 
-  .monthly-description {
-    font-size: 0.75rem;
-    line-height: 1.6;
-  }
 
   /* Optimize for very small screens */
   .monthly-stat-value {

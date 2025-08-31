@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './SkipRateAnalysis.css';
 import { listeningPatternsService } from '../../services/listeningPatternsService';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
+import SectionDescription from '../common/SectionDescription/SectionDescription';
 
 export default function SkipRateAnalysis({ selectedYear = null }) {
   const [skipData, setSkipData] = useState(null);
@@ -350,9 +351,9 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
       <SectionTitle title="Skip Rate Analysis" />
       
       <div className="skip-section">
-        <p className="section-description">
+        <SectionDescription>
           Analysis of your skipping behavior and patterns{selectedYear && ` for ${selectedYear}`}
-        </p>
+        </SectionDescription>
       </div>
 
       <div className="skip-header">

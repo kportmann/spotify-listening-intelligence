@@ -1,0 +1,24 @@
+.section-description {
+  color: #b3b3b3;
+  font-size: 0.85rem;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .section-description {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-description {
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+}

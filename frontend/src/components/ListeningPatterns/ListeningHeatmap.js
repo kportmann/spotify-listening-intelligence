@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ListeningHeatmap.css';
 import { listeningPatternsService } from '../../services/listeningPatternsService';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
+import SectionDescription from '../common/SectionDescription/SectionDescription';
 
 export default function ListeningHeatmap({ selectedYear = null }) {
   const [heatmapData, setHeatmapData] = useState(null);
@@ -99,9 +100,9 @@ export default function ListeningHeatmap({ selectedYear = null }) {
       <SectionTitle title="Listening Activity Heatmap" />
       
       <div className="heatmap-section">
-        <p className="heatmap-description">
+        <SectionDescription>
           Your listening patterns by day of week and time of day{selectedYear && ` for ${selectedYear}`} - each ring represents a day, segments show hourly activity
-        </p>
+        </SectionDescription>
       </div>
 
       <div className="heatmap-header">

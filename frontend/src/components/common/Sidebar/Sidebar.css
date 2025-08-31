@@ -70,13 +70,8 @@
   background-color: #1a1a1a;
 }
 
-.nav-item.active:hover {
-  background-color: rgba(29, 185, 84, 0.15);
-}
-
 .nav-item.active {
   color: #ffffff;
-  background-color: rgba(29, 185, 84, 0.1);
   border-left: 3px solid #1db954;
 }
 

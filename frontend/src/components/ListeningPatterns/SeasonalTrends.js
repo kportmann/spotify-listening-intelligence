@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './SeasonalTrends.css';
 import { listeningPatternsService } from '../../services/listeningPatternsService';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
+import SectionDescription from '../common/SectionDescription/SectionDescription';
 
 export default function SeasonalTrends({ selectedYear = null }) {
   const [seasonalData, setSeasonalData] = useState(null);
@@ -85,9 +86,9 @@ export default function SeasonalTrends({ selectedYear = null }) {
       <div className="seasonal-trends-container">
         <SectionTitle title="Seasonal Listening Patterns" />
         <div className="seasonal-section">
-          <p className="seasonal-description">
+          <SectionDescription maxWidth={600}>
             Your listening patterns across the four seasons{selectedYear && ` for ${selectedYear}`}
-          </p>
+          </SectionDescription>
         </div>
         <div className="seasonal-error">
           No seasonal data available{selectedYear ? ` for ${selectedYear}` : ''}. 
@@ -103,10 +104,10 @@ export default function SeasonalTrends({ selectedYear = null }) {
     <div className="seasonal-trends-container">
       <SectionTitle title="Seasonal Listening Patterns" />
       
-      <div className="trends-section">
-        <p className="section-description">
+      <div className="seasonal-section">
+        <SectionDescription maxWidth={600}>
           Your listening patterns across the four seasons{selectedYear && ` for ${selectedYear}`}
-        </p>
+        </SectionDescription>
       </div>
 
       <div className="seasons-grid">
