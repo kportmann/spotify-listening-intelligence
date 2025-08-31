@@ -47,8 +47,6 @@ class SpotifyService(SpotifyBaseService):
     """Service for single Spotify API requests and search operations"""
     
     async def search_artist(self, artist_name: str, refresh_cache: bool = False) -> Optional[SpotifyArtist]:
-        """Search for artist and return artist data with images"""
-        # Check cache first
         cache_key = self._get_cache_key("artist", artist_name.lower())
         cached_result = self._get_from_cache(cache_key, refresh_cache)
         if cached_result is not None:
@@ -77,7 +75,6 @@ class SpotifyService(SpotifyBaseService):
             artists = data.get("artists", {}).get("items", [])
             
             if not artists:
-                # Cache negative results too
                 self._set_cache(cache_key, None)
                 return None
             
@@ -91,12 +88,10 @@ class SpotifyService(SpotifyBaseService):
                 popularity=artist["popularity"]
             )
             
-            # Cache the result
             self._set_cache(cache_key, result)
             return result
     
     async def get_artist_by_id(self, artist_id: str) -> Optional[SpotifyArtist]:
-        """Get artist data by Spotify ID"""
         access_token = await self.get_client_credentials_token()
         
         headers = {"Authorization": f"Bearer {access_token}"}
@@ -121,7 +116,6 @@ class SpotifyService(SpotifyBaseService):
             )
     
     async def search_track(self, track_name: str, artist_name: str, refresh_cache: bool = False) -> Optional[SpotifyTrack]:
-        """Search for track and return track data with album artwork"""
         # Check cache first
         cache_key = self._get_cache_key("track", f"{track_name}|{artist_name}".lower())
         cached_result = self._get_from_cache(cache_key, refresh_cache)
@@ -153,7 +147,6 @@ class SpotifyService(SpotifyBaseService):
             tracks = data.get("tracks", {}).get("items", [])
             
             if not tracks:
-                # Cache negative results too
                 self._set_cache(cache_key, None)
                 return None
             
@@ -166,12 +159,10 @@ class SpotifyService(SpotifyBaseService):
                 album_images=[SpotifyImage(**img) for img in track["album"]["images"]]
             )
             
-            # Cache the result
             self._set_cache(cache_key, result)
             return result
     
     async def search_show(self, show_name: str) -> Optional[SpotifyShow]:
-        """Search for podcast show and return show data with images"""
         # Check cache first
         cache_key = self._get_cache_key("show", show_name.lower())
         cached_result = self._get_from_cache(cache_key)
@@ -201,7 +192,6 @@ class SpotifyService(SpotifyBaseService):
             shows = data.get("shows", {}).get("items", [])
             
             if not shows:
-                # Cache negative results too
                 self._set_cache(cache_key, None)
                 return None
             
@@ -214,12 +204,10 @@ class SpotifyService(SpotifyBaseService):
                 publisher=show["publisher"]
             )
             
-            # Cache the result
             self._set_cache(cache_key, result)
             return result
     
     async def search_episode(self, episode_name: str, show_name: str = None) -> Optional[SpotifyEpisode]:
-        """Search for podcast episode and return episode data with images"""
         # Check cache first
         cache_key = self._get_cache_key("episode", f"{episode_name}|{show_name or ''}".lower())
         cached_result = self._get_from_cache(cache_key)
@@ -254,7 +242,6 @@ class SpotifyService(SpotifyBaseService):
             episodes = data.get("episodes", {}).get("items", [])
             
             if not episodes:
-                # Cache negative results too
                 self._set_cache(cache_key, None)
                 return None
             
@@ -278,16 +265,11 @@ class SpotifyService(SpotifyBaseService):
                 show=show
             )
             
-            # Cache the result
             self._set_cache(cache_key, result)
             return result
 
     async def get_artists_batch_by_names(self, artist_names: List[str]) -> Dict[str, SpotifyArtist]:
-        """
-        Get multiple artists by names using intelligent caching
-        Combines individual searches with batch API where possible
-        Returns dict mapping artist_name -> SpotifyArtist
-        """
+        """Hybrid: search names → cache IDs → batch API for cached IDs"""
         if not artist_names:
             return {}
         
@@ -334,11 +316,7 @@ class SpotifyService(SpotifyBaseService):
         return results
 
     async def get_shows_batch_by_names(self, show_names: List[str]) -> Dict[str, SpotifyShow]:
-        """
-        Get multiple shows by names using intelligent caching
-        Similar to artist batch approach but for podcast shows
-        Returns dict mapping show_name -> SpotifyShow
-        """
+        """Similar to artist batch approach but for podcast shows"""
         if not show_names:
             return {}
         

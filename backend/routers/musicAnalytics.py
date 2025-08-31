@@ -19,7 +19,6 @@ class ImageRequest(BaseModel):
 
 @router.post("/images/batch")
 async def get_batch_images(request: ImageRequest):
-    """Fetch images for multiple artists and/or tracks in a single request"""
     results = {
         "artist_images": {},
         "track_images": {}
@@ -31,7 +30,6 @@ async def get_batch_images(request: ImageRequest):
             try:
                 spotify_artist = await spotify_service.search_artist(artist_name)
                 if spotify_artist and spotify_artist.images:
-                    # Get medium size image (usually index 1) or first available
                     image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
                     results["artist_images"][artist_name] = image_url
                 else:
@@ -50,7 +48,6 @@ async def get_batch_images(request: ImageRequest):
             try:
                 spotify_track = await spotify_service.search_track(track_name, artist_name)
                 if spotify_track and spotify_track.album_images:
-                    # Get medium size image (usually index 1) or first available
                     image_url = spotify_track.album_images[1].url if len(spotify_track.album_images) > 1 else spotify_track.album_images[0].url
                     results["track_images"][key] = image_url
                 else:
@@ -69,7 +66,6 @@ async def get_top_artists(
     include_images: Optional[bool] = Query(False, description="Include artist images from Spotify API"),
     refresh_cache: Optional[bool] = Query(False, description="Force refresh of cached image data")
 ):
-    """Get top artists by listening time"""
     
     query = db.query(
         SpotifyStream.master_metadata_album_artist_name.label('artist_name'),
@@ -122,7 +118,6 @@ async def get_top_artists(
                 if artist_name in batch_artists:
                     spotify_artist = batch_artists[artist_name]
                     if spotify_artist.images:
-                        # Get medium size image (usually index 1) or first available
                         image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
                         artist_data["image_url"] = image_url
         
@@ -152,7 +147,6 @@ async def get_top_tracks(
     include_images: Optional[bool] = Query(False, description="Include album artwork from Spotify API"),
     refresh_cache: Optional[bool] = Query(False, description="Force refresh of cached image data")
 ):
-    """Get top tracks by listening time"""
     
     query = db.query(
         SpotifyStream.master_metadata_track_name.label('track_name'),
@@ -208,13 +202,10 @@ async def get_top_tracks(
     # Only fetch images if explicitly requested
     if include_images:
         try:
-            # Use batch API to get track data from URIs - MUCH FASTER!
+            # Batch API using existing URIs - ~50x faster than individual searches
             batch_tracks = await spotify_batch_service.get_tracks_from_uris(track_uris)
             
-            # Create lookup map: URI -> SpotifyTrack
             track_lookup = {f"spotify:track:{track.id}": track for track in batch_tracks}
-            
-            # Enhance track data with images from batch results
             for track_data in track_data_list:
                 if track_data["track_uri"] in track_lookup:
                     spotify_track = track_lookup[track_data["track_uri"]]
@@ -240,7 +231,7 @@ async def get_top_tracks(
                     print(f"Failed to fetch image for track {track_data['track_name']}: {e2}")
                     pass
     
-    # Remove track_uri from response (internal use only)
+    # Remove internal track_uri field
     for track_data in track_data_list:
         track_data.pop("track_uri", None)
     
@@ -248,17 +239,14 @@ async def get_top_tracks(
 
 @router.get("/cache/stats")
 async def get_cache_stats():
-    """Get cache statistics for debugging"""
     return spotify_service.get_cache_stats()
 
 @router.post("/cache/clear-null")
 async def clear_null_caches():
-    """Clear all cached null image results to force retry"""
     spotify_service.clear_null_caches()
     return {"message": "Null cache entries cleared", "stats": spotify_service.get_cache_stats()}
 
 def _get_cutoff_date(period: str) -> Optional[datetime]:
-    """Helper function to calculate cutoff date based on period"""
     now = datetime.now(timezone.utc)
     
     period_mapping = {

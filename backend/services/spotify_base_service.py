@@ -17,17 +17,15 @@ class SpotifyBaseService:
         self.base_url = "https://api.spotify.com/v1"
         self.auth_url = "https://accounts.spotify.com/api/token"
         
-        # Simple in-memory cache with 15-minute TTL for successful results
-        # Null results get shorter TTL to allow retries
+        # Two-tier caching: 15min for success, 5min for null results to allow retries
         self._cache: Dict[str, Dict[str, Any]] = {}
-        self._cache_ttl = 15 * 60  # 15 minutes in seconds for successful results
-        self._null_cache_ttl = 5 * 60  # 5 minutes for null results
+        self._cache_ttl = 15 * 60
+        self._null_cache_ttl = 5 * 60
         
         if not all([self.client_id, self.client_secret, self.redirect_uri]):
             raise ValueError("Missing Spotify API credentials in environment variables")
     
     def clear_null_caches(self) -> None:
-        """Clear all cached null results to force retry"""
         keys_to_remove = []
         for key, entry in self._cache.items():
             if entry["data"] is None:
@@ -39,7 +37,6 @@ class SpotifyBaseService:
         print(f"Cleared {len(keys_to_remove)} null cache entries")
     
     def get_cache_stats(self) -> Dict[str, int]:
-        """Get cache statistics for debugging"""
         total_entries = len(self._cache)
         null_entries = sum(1 for entry in self._cache.values() if entry["data"] is None)
         return {
@@ -49,19 +46,14 @@ class SpotifyBaseService:
         }
     
     def _get_cache_key(self, prefix: str, identifier: str) -> str:
-        """Generate cache key for storing API responses"""
         return f"{prefix}:{identifier}"
     
     def _is_cache_valid(self, cache_entry: Dict[str, Any]) -> bool:
-        """Check if cache entry is still valid (within TTL)"""
-        # Use shorter TTL for null results to allow retries
         ttl = self._null_cache_ttl if cache_entry["data"] is None else self._cache_ttl
         return time.time() - cache_entry["timestamp"] < ttl
     
     def _get_from_cache(self, cache_key: str, refresh_cache: bool = False) -> Optional[Any]:
-        """Get item from cache if valid"""
         if refresh_cache and cache_key in self._cache:
-            # Force refresh by removing from cache
             del self._cache[cache_key]
             return None
             
@@ -70,19 +62,16 @@ class SpotifyBaseService:
             if self._is_cache_valid(entry):
                 return entry["data"]
             else:
-                # Remove expired entry
                 del self._cache[cache_key]
         return None
     
     def _set_cache(self, cache_key: str, data: Any) -> None:
-        """Store item in cache with current timestamp"""
         self._cache[cache_key] = {
             "data": data,
             "timestamp": time.time()
         }
     
     async def get_client_credentials_token(self) -> str:
-        """Get access token using Client Credentials flow (for public data only)"""
         auth_string = f"{self.client_id}:{self.client_secret}"
         auth_bytes = auth_string.encode("utf-8")
         auth_b64 = base64.b64encode(auth_bytes).decode("utf-8")
@@ -103,7 +92,7 @@ class SpotifyBaseService:
             return response.json()["access_token"]
     
     def _extract_spotify_id(self, uri: str) -> Optional[str]:
-        """Extract Spotify ID from URI (e.g., 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh' -> '4iV5W9uYEdYUVa79Axb7Rh')"""
+        """Extract ID from URI: 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh' -> '4iV5W9uYEdYUVa79Axb7Rh'"""
         if not uri or not uri.startswith("spotify:"):
             return None
         parts = uri.split(":")

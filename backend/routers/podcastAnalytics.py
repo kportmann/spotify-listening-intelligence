@@ -19,7 +19,6 @@ class PodcastImageRequest(BaseModel):
 
 @router.post("/images/batch")
 async def get_batch_podcast_images(request: PodcastImageRequest):
-    """Fetch images for podcast episodes and shows in a single request"""
     results = {
         "episode_images": {},
         "show_images": {}
@@ -35,7 +34,6 @@ async def get_batch_podcast_images(request: PodcastImageRequest):
             try:
                 spotify_episode = await spotify_service.search_episode(episode_name, show_name)
                 if spotify_episode and spotify_episode.images:
-                    # Get medium size image (usually index 1) or first available
                     image_url = spotify_episode.images[1].url if len(spotify_episode.images) > 1 else spotify_episode.images[0].url
                     results["episode_images"][key] = image_url
                 else:
@@ -50,7 +48,6 @@ async def get_batch_podcast_images(request: PodcastImageRequest):
             try:
                 spotify_show = await spotify_service.search_show(show_name)
                 if spotify_show and spotify_show.images:
-                    # Get medium size image (usually index 1) or first available
                     image_url = spotify_show.images[1].url if len(spotify_show.images) > 1 else spotify_show.images[0].url
                     results["show_images"][show_name] = image_url
                 else:
@@ -69,7 +66,6 @@ async def get_top_episodes(
     limit: Optional[int] = Query(50, description="Number of results to return"),
     include_images: Optional[bool] = Query(False, description="Include episode images from Spotify API")
 ):
-    """Get top podcast episodes by listening time"""
     
     query = db.query(
         SpotifyStream.episode_name.label('episode_name'),
@@ -121,7 +117,6 @@ async def get_top_episodes(
                     episode_data["show_name"]
                 )
                 if spotify_episode and spotify_episode.images:
-                    # Get medium size image (usually index 1) or first available
                     image_url = spotify_episode.images[1].url if len(spotify_episode.images) > 1 else spotify_episode.images[0].url
                     episode_data["image_url"] = image_url
             except Exception as e:
@@ -139,7 +134,6 @@ async def get_top_shows(
     limit: Optional[int] = Query(50, description="Number of results to return"),
     include_images: Optional[bool] = Query(False, description="Include show images from Spotify API")
 ):
-    """Get top podcast shows by listening time"""
     
     query = db.query(
         SpotifyStream.episode_show_name.label('show_name'),
@@ -218,7 +212,6 @@ async def get_top_audiobooks(
     period: Optional[str] = Query("all_time", description="Time period: 7d, 1m, 3m, 6m, 1y, all_time"),
     limit: Optional[int] = Query(50, description="Number of results to return")
 ):
-    """Get top audiobooks by listening time"""
     
     query = db.query(
         SpotifyStream.audiobook_title.label('audiobook_title'),
@@ -258,7 +251,6 @@ async def get_top_audiobooks(
 
 
 def _get_cutoff_date(period: str) -> Optional[datetime]:
-    """Helper function to calculate cutoff date based on period"""
     now = datetime.now(timezone.utc)
     
     period_mapping = {

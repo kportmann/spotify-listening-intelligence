@@ -47,11 +47,6 @@ class SpotifyBatchService(SpotifyBaseService):
     """Service for batch Spotify API operations"""
     
     async def get_several_tracks(self, track_ids: List[str]) -> List[SpotifyTrack]:
-        """
-        Get multiple tracks using batch API endpoint
-        track_ids: List of Spotify track IDs (not URIs)
-        Maximum 50 IDs per request
-        """
         if not track_ids:
             return []
             
@@ -62,7 +57,6 @@ class SpotifyBatchService(SpotifyBaseService):
             chunk = track_ids[i:i+50]
             ids_param = ",".join(chunk)
             
-            # Check cache first for this chunk
             cache_key = f"batch_tracks:{ids_param}"
             cached_result = self._get_from_cache(cache_key)
             if cached_result is not None:
@@ -96,18 +90,12 @@ class SpotifyBatchService(SpotifyBaseService):
                         )
                         chunk_results.append(track)
                 
-                # Cache this chunk
                 self._set_cache(cache_key, chunk_results)
                 results.extend(chunk_results)
         
         return results
 
     async def get_several_artists(self, artist_ids: List[str]) -> List[SpotifyArtist]:
-        """
-        Get multiple artists using batch API endpoint
-        artist_ids: List of Spotify artist IDs (not URIs)
-        Maximum 50 IDs per request
-        """
         if not artist_ids:
             return []
             
@@ -118,7 +106,6 @@ class SpotifyBatchService(SpotifyBaseService):
             chunk = artist_ids[i:i+50]
             ids_param = ",".join(chunk)
             
-            # Check cache first for this chunk
             cache_key = f"batch_artists:{ids_param}"
             cached_result = self._get_from_cache(cache_key)
             if cached_result is not None:
@@ -153,18 +140,12 @@ class SpotifyBatchService(SpotifyBaseService):
                         )
                         chunk_results.append(artist)
                 
-                # Cache this chunk
                 self._set_cache(cache_key, chunk_results)
                 results.extend(chunk_results)
         
         return results
 
     async def get_several_shows(self, show_ids: List[str]) -> List[SpotifyShow]:
-        """
-        Get multiple shows using batch API endpoint  
-        show_ids: List of Spotify show IDs (not URIs)
-        Maximum 50 IDs per request
-        """
         if not show_ids:
             return []
             
@@ -175,7 +156,6 @@ class SpotifyBatchService(SpotifyBaseService):
             chunk = show_ids[i:i+50]
             ids_param = ",".join(chunk)
             
-            # Check cache first for this chunk
             cache_key = f"batch_shows:{ids_param}"
             cached_result = self._get_from_cache(cache_key)
             if cached_result is not None:
@@ -209,17 +189,12 @@ class SpotifyBatchService(SpotifyBaseService):
                         )
                         chunk_results.append(show)
                 
-                # Cache this chunk
                 self._set_cache(cache_key, chunk_results)
                 results.extend(chunk_results)
         
         return results
 
     async def get_tracks_from_uris(self, track_uris: List[str]) -> List[SpotifyTrack]:
-        """
-        Get multiple tracks from Spotify URIs by extracting IDs and using batch API
-        track_uris: List of Spotify track URIs (e.g., 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh')
-        """
         track_ids = []
         for uri in track_uris:
             spotify_id = self._extract_spotify_id(uri)
@@ -229,27 +204,7 @@ class SpotifyBatchService(SpotifyBaseService):
         return await self.get_several_tracks(track_ids)
 
     async def get_shows_from_episode_uris(self, episode_uris: List[str]) -> Dict[str, SpotifyShow]:
-        """
-        Get show information from episode URIs
-        This requires individual episode lookups first, then batch show requests
-        Returns dict mapping episode_uri -> SpotifyShow
-        """
-        # For now, we'll need individual episode lookups to get show IDs
-        # This could be optimized in the future by caching episode->show mappings
-        from .spotify_service import spotify_service
-        
-        show_ids = set()
-        episode_to_show = {}
-        
-        # First, get show IDs from episodes (this part still requires individual calls)
-        for episode_uri in episode_uris:
-            episode_id = self._extract_spotify_id(episode_uri)
-            if episode_id:
-                # We'd need to call individual episode endpoint to get show ID
-                # For now, this is a limitation - episodes don't have direct batch show lookup
-                pass
-        
-        # This method would need enhancement once we have episode->show ID mappings
+        # TODO: Episodes don't have direct batch show lookup - needs individual episode calls first
         return {}
 
 
