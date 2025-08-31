@@ -75,7 +75,7 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
             <h4>Key Insights</h4>
             <div className="insights-grid">
               {insights.most_skipped_artist && (
-                <div className="insight-card">
+                <div className="skip-insight-card">
                   <div className="insight-title">Most Skipped Artist</div>
                   <div className="insight-value">{insights.most_skipped_artist.artist_name}</div>
                   <div className="insight-detail">{insights.most_skipped_artist.skip_rate}% skip rate</div>
@@ -83,7 +83,7 @@ export default function SkipRateAnalysis({ selectedYear = null }) {
               )}
 
               {insights.least_skipped_artist && (
-                <div className="insight-card">
+                <div className="skip-insight-card">
                   <div className="insight-title">Least Skipped Artist</div>
                   <div className="insight-value">{insights.least_skipped_artist.artist_name}</div>
                   <div className="insight-detail">{insights.least_skipped_artist.skip_rate}% skip rate</div>

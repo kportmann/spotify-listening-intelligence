@@ -65,7 +65,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
     return (
       <div className="seasonal-trends-container">
         <SectionTitle title="Seasonal Listening Trends" />
-        <div className="trends-loading">
+        <div className="seasonal-loading">
           Loading seasonal patterns {selectedYear ? ` for ${selectedYear}` : ''}...
         </div>
       </div>
@@ -75,7 +75,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
   if (error) {
     return (
       <div className="seasonal-trends-container">
-        <div className="trends-error">Failed to load seasonal patterns: {error}</div>
+        <div className="seasonal-error">Failed to load seasonal patterns: {error}</div>
       </div>
     );
   }
@@ -84,12 +84,12 @@ export default function SeasonalTrends({ selectedYear = null }) {
     return (
       <div className="seasonal-trends-container">
         <SectionTitle title="Seasonal Listening Patterns" />
-        <div className="trends-section">
-          <p className="section-description">
+        <div className="seasonal-section">
+          <p className="seasonal-description">
             Your listening patterns across the four seasons{selectedYear && ` for ${selectedYear}`}
           </p>
         </div>
-        <div className="trends-error">
+        <div className="seasonal-error">
           No seasonal data available{selectedYear ? ` for ${selectedYear}` : ''}. 
           {selectedYear && ' Try selecting a different year or "All Time" to see your listening patterns.'}
         </div>
@@ -128,8 +128,8 @@ export default function SeasonalTrends({ selectedYear = null }) {
 
               <div className="season-stats">
                 <div className="stat-item">
-                  <div className="stat-label">Total Streams</div>
-                  <div className="stat-value">{season.total_streams.toLocaleString()}</div>
+                  <div className="seasonal-stat-label">Total Streams</div>
+                  <div className="seasonal-stat-value">{season.total_streams.toLocaleString()}</div>
                   <div className="stat-bar">
                     <div 
                       className="stat-progress streams-progress"
@@ -142,8 +142,8 @@ export default function SeasonalTrends({ selectedYear = null }) {
                 </div>
 
                 <div className="stat-item">
-                  <div className="stat-label">Total Minutes</div>
-                  <div className="stat-value">{season.total_minutes.toLocaleString()}</div>
+                  <div className="seasonal-stat-label">Total Minutes</div>
+                  <div className="seasonal-stat-value">{season.total_minutes.toLocaleString()}</div>
                   <div className="stat-bar">
                     <div 
                       className="stat-progress minutes-progress"
@@ -159,13 +159,13 @@ export default function SeasonalTrends({ selectedYear = null }) {
                 {season.years_covered > 1 && (
                   <>
                     <div className="stat-item">
-                      <div className="stat-label">Avg Streams/Year</div>
-                      <div className="stat-value">{season.avg_streams_per_year.toLocaleString()}</div>
+                      <div className="seasonal-stat-label">Avg Streams/Year</div>
+                      <div className="seasonal-stat-value">{season.avg_streams_per_year.toLocaleString()}</div>
                     </div>
 
                     <div className="stat-item">
-                      <div className="stat-label">Avg Minutes/Year</div>
-                      <div className="stat-value">{season.avg_minutes_per_year.toLocaleString()}</div>
+                      <div className="seasonal-stat-label">Avg Minutes/Year</div>
+                      <div className="seasonal-stat-value">{season.avg_minutes_per_year.toLocaleString()}</div>
                     </div>
                   </>
                 )}

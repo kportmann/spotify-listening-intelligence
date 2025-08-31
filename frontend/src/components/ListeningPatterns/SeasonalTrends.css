@@ -7,27 +7,27 @@
   margin-bottom: 2rem;
 }
 
-.trends-loading,
-.trends-error {
+.seasonal-loading,
+.seasonal-error {
   text-align: center;
   padding: 2rem;
   font-size: 1rem;
 }
 
-.trends-loading {
+.seasonal-loading {
   color: #b3b3b3;
 }
 
-.trends-error {
+.seasonal-error {
   color: #f44336;
 }
 
-.trends-section {
+.seasonal-section {
   text-align: center;
   margin-bottom: 2rem;
 }
 
-.section-description {
+.seasonal-description {
   color: #b3b3b3;
   font-size: 0.85rem;
   margin: 0;
@@ -91,13 +91,13 @@
   gap: 0.3rem;
 }
 
-.stat-label {
+.seasonal-stat-label {
   font-size: 0.8rem;
   color: #b3b3b3;
   font-weight: 500;
 }
 
-.stat-value {
+.seasonal-stat-value {
   font-size: 1.1rem;
   font-weight: 600;
   color: #ffffff;
@@ -159,12 +159,12 @@
   gap: 0.5rem;
 }
 
-.summary-stat .stat-label {
+.summary-stat .seasonal-stat-label {
   font-size: 0.8rem;
   color: #b3b3b3;
 }
 
-.summary-stat .stat-value {
+.summary-stat .seasonal-stat-value {
   font-size: 1.1rem;
   font-weight: 600;
   color: #1db954;
@@ -247,12 +247,12 @@
     gap: 0.4rem;
   }
 
-  .stat-label {
+  .seasonal-stat-label {
     font-size: 0.85rem;
     font-weight: 600;
   }
 
-  .stat-value {
+  .seasonal-stat-value {
     font-size: 1.1rem;
     font-weight: 700;
   }
@@ -282,7 +282,7 @@
     gap: 1rem;
   }
 
-  .section-description {
+  .seasonal-description {
     font-size: 0.85rem;
     line-height: 1.5;
   }
@@ -352,12 +352,12 @@
     gap: 0.3rem;
   }
 
-  .stat-label {
+  .seasonal-stat-label {
     font-size: 0.8rem;
     text-align: center; /* Center align labels on mobile */
   }
 
-  .stat-value {
+  .seasonal-stat-value {
     font-size: 1rem;
     text-align: center; /* Center align values on mobile */
   }
@@ -387,12 +387,12 @@
     padding: 1rem;
   }
 
-  .summary-stat .stat-value {
+  .summary-stat .seasonal-stat-value {
     font-size: 1rem;
     text-align: center;
   }
 
-  .section-description {
+  .seasonal-description {
     font-size: 0.75rem;
     line-height: 1.6;
   }
@@ -418,7 +418,7 @@
     font-size: 1rem;
   }
 
-  .stat-value {
+  .seasonal-stat-value {
     font-size: 0.95rem;
   }
 

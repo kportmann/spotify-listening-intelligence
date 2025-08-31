@@ -7,27 +7,27 @@
   margin-bottom: 2rem;
 }
 
-.trends-loading,
-.trends-error {
+.monthly-loading,
+.monthly-error {
   text-align: center;
   padding: 2rem;
   font-size: 1rem;
 }
 
-.trends-loading {
+.monthly-loading {
   color: #b3b3b3;
 }
 
-.trends-error {
+.monthly-error {
   color: #f44336;
 }
 
-.trends-section {
+.monthly-section {
   text-align: center;
   margin-bottom: 1.5rem;
 }
 
-.section-description {
+.monthly-description {
   color: #b3b3b3;
   font-size: 0.85rem;
   margin: 0;
@@ -400,13 +400,13 @@
   text-align: center;
 }
 
-.stat-label {
+.monthly-stat-label {
   font-size: 0.8rem;
   color: #b3b3b3;
   margin-bottom: 0.5rem;
 }
 
-.stat-value {
+.monthly-stat-value {
   font-size: 1.2rem;
   font-weight: 600;
   color: #1db954;
@@ -469,7 +469,7 @@
   margin-bottom: 1rem;
 }
 
-.insight-card {
+.monthly-insight-card {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid #3e3e3e;
   border-radius: 8px;
@@ -664,11 +664,11 @@
     gap: 1rem;
   }
 
-  .stat-value {
+  .monthly-stat-value {
     font-size: 1.1rem;
   }
 
-  .section-description {
+  .monthly-description {
     font-size: 0.8rem;
     line-height: 1.5;
   }
@@ -813,17 +813,17 @@
     padding: 1rem;
   }
 
-  .section-description {
+  .monthly-description {
     font-size: 0.75rem;
     line-height: 1.6;
   }
 
   /* Optimize for very small screens */
-  .stat-value {
+  .monthly-stat-value {
     font-size: 1rem;
   }
 
-  .summary-stat .stat-label {
+  .summary-stat .monthly-stat-label {
     font-size: 0.75rem;
   }
 }

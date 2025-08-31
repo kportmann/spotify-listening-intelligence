@@ -102,7 +102,7 @@
   margin-bottom: 1.5rem;
 }
 
-.section-description {
+.heatmap-description {
   color: #b3b3b3;
   font-size: 0.85rem;
   margin: 0;
@@ -177,12 +177,12 @@
   gap: 0.25rem;
 }
 
-.stat-label {
+.heatmap-stat-label {
   font-size: 0.8rem;
   color: #b3b3b3;
 }
 
-.stat-value {
+.heatmap-stat-value {
   font-size: 1.1rem;
   font-weight: 600;
   color: #1db954;
@@ -238,7 +238,7 @@
   }
 
 
-  .section-description {
+  .heatmap-description {
     font-size: 0.8rem;
   }
 
@@ -280,7 +280,7 @@
   }
 
 
-  .section-description {
+  .heatmap-description {
     font-size: 0.75rem;
   }
 }

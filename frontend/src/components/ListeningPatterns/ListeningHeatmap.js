@@ -99,7 +99,7 @@ export default function ListeningHeatmap({ selectedYear = null }) {
       <SectionTitle title="Listening Activity Heatmap" />
       
       <div className="heatmap-section">
-        <p className="section-description">
+        <p className="heatmap-description">
           Your listening patterns by day of week and time of day{selectedYear && ` for ${selectedYear}`} - each ring represents a day, segments show hourly activity
         </p>
       </div>

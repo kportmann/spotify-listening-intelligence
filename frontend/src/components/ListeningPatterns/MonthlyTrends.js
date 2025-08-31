@@ -122,7 +122,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
     return (
       <div className="monthly-trends-container">
         <SectionTitle title="Monthly Listening Trends" />
-        <div className="trends-loading">
+        <div className="monthly-loading">
           Loading monthly patterns{selectedYear ? ` for ${selectedYear}` : ''}...
         </div>
       </div>
@@ -132,7 +132,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
   if (error) {
     return (
       <div className="monthly-trends-container">
-        <div className="trends-error">Failed to load monthly patterns: {error}</div>
+        <div className="monthly-error">Failed to load monthly patterns: {error}</div>
       </div>
     );
   }
@@ -141,12 +141,12 @@ export default function MonthlyTrends({ selectedYear = null }) {
     return (
       <div className="monthly-trends-container">
         <SectionTitle title="Monthly Listening Patterns" />
-        <div className="trends-section">
-          <p className="section-description">
+        <div className="monthly-section">
+          <p className="monthly-description">
             Your listening activity by month{selectedYear && ` for ${selectedYear}`} - track patterns
           </p>
         </div>
-        <div className="trends-error">
+        <div className="monthly-error">
           No monthly data available{selectedYear ? ` for ${selectedYear}` : ''}. 
           {selectedYear && ' Try selecting a different year or "All Time" to see your listening patterns.'}
         </div>
@@ -685,18 +685,18 @@ export default function MonthlyTrends({ selectedYear = null }) {
       <div className="trends-summary">
         <div className="summary-grid">
           <div className="summary-stat">
-            <div className="stat-label">Total Months</div>
-            <div className="stat-value">{monthlyData.total_months}</div>
+            <div className="monthly-stat-label">Total Months</div>
+            <div className="monthly-stat-value">{monthlyData.total_months}</div>
           </div>
           <div className="summary-stat">
-            <div className="stat-label">Total Streams</div>
-            <div className="stat-value">
+            <div className="monthly-stat-label">Total Streams</div>
+            <div className="monthly-stat-value">
               {monthlyData.monthly_trends.reduce((sum, m) => sum + m.stream_count, 0).toLocaleString()}
             </div>
           </div>
           <div className="summary-stat">
-            <div className="stat-label">Total Minutes</div>
-            <div className="stat-value">
+            <div className="monthly-stat-label">Total Minutes</div>
+            <div className="monthly-stat-value">
               {monthlyData.monthly_trends.reduce((sum, m) => sum + m.total_minutes, 0).toLocaleString()}
             </div>
           </div>
@@ -725,7 +725,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                       m.stream_count > max.stream_count ? m : max, monthlyData.monthly_trends[0]);
                   
                   return (
-                    <div className="insight-card">
+                    <div className="monthly-insight-card">
                       <div className="insight-header">Peak Activity Comparison</div>
                       <div className="peak-comparison">
                         <div className="peak-item">
@@ -754,7 +754,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                   const lowest = avgMinutesPerStream.reduce((min, m) => m.avgPerStream < min.avgPerStream ? m : min);
                   
                   return (
-                    <div className="insight-card">
+                    <div className="monthly-insight-card">
                       <div className="insight-header">Listening Depth Analysis</div>
                       <div className="listening-depth">
                         <div className="depth-item">
