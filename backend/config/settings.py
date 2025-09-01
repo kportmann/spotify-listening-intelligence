@@ -1,21 +1,20 @@
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
 from pathlib import Path
-import os
 
 class DatabaseSettings(BaseSettings):
     """Database configuration settings."""
     
-    host: str = "db"
+    host: str
     port: int = 5432
     user: str
     password: str
-    database: str = "my_spotify_data"
+    db: str
     
     @property
     def connection_string(self) -> str:
         """Generate PostgreSQL connection string."""
-        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
+        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.db}"
     
     @property
     def psycopg2_params(self) -> dict:
@@ -25,7 +24,7 @@ class DatabaseSettings(BaseSettings):
             'port': self.port,
             'user': self.user,
             'password': self.password,
-            'database': self.database
+            'database': self.db
         }
 
     model_config = {
