@@ -1,4 +1,4 @@
-# Your Spotify Music App
+# Spotify Listening Intelligence
 
 ## Setup Instructions
 

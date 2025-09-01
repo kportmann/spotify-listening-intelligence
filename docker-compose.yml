@@ -1,3 +1,5 @@
+name: spotify-listening-intelligence
+
 services:
   backend:
     build:
@@ -11,7 +13,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      - spotify-listening-intelligence-db
 
   # Frontend React Service
   frontend:
@@ -28,7 +30,7 @@ services:
     tty: true
 
   # PostgreSQL Database Service
-  db:
+  spotify-listening-intelligence-db:
     image: postgres:14-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -38,7 +40,7 @@ services:
       - "5432:5432"
 
   # pgAdmin 4 Database GUI
-  pgadmin:
+  spotify-listening-intelligence-pgadmin:
     image: dpage/pgadmin4:latest
     ports:
       - "8080:80"
@@ -48,7 +50,7 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
-      - db
+      - spotify-listening-intelligence-db
 
 volumes:
   postgres_data:
