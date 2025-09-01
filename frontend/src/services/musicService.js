@@ -19,28 +19,6 @@ export const musicService = {
     return response.json();
   },
 
-  async getImagesForContent(artists = [], tracks = []) {
-    const response = await fetch(`${API_BASE_URL}/music/images/batch`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        artists,
-        tracks: tracks.map(track => ({
-          track_name: track.track_name,
-          artist_name: track.artist_name
-        }))
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch images');
-    }
-    return response.json();
-  },
-
-
   async getAllTopMusicContent(period = 'all_time', limit = 5, includeImages = true) {
     const [artists, tracks] = await Promise.all([
       this.getTopArtists(period, limit, includeImages),

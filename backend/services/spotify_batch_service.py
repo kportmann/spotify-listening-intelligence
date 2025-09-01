@@ -203,6 +203,16 @@ class SpotifyBatchService(SpotifyBaseService):
         
         return await self.get_several_tracks(track_ids)
 
+    async def get_artists_from_uris(self, artist_uris: List[str]) -> List[SpotifyArtist]:
+        """Get artist details from artist URIs - converts URIs to IDs then batch fetches"""
+        artist_ids = []
+        for uri in artist_uris:
+            spotify_id = self._extract_spotify_id(uri)
+            if spotify_id:
+                artist_ids.append(spotify_id)
+        
+        return await self.get_several_artists(artist_ids)
+
     async def get_shows_from_episode_uris(self, episode_uris: List[str]) -> Dict[str, SpotifyShow]:
         # TODO: Episodes don't have direct batch show lookup - needs individual episode calls first
         return {}

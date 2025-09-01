@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc, extract
 from database.connection import get_db
-from database.schema import SpotifyStream
+from database.schema import SpotifyStream, Artist, Track
 from services.spotify_service import spotify_service
 from services.spotify_batch_service import spotify_batch_service
 from typing import Optional, List
@@ -24,19 +24,36 @@ async def get_batch_images(request: ImageRequest):
         "track_images": {}
     }
     
-    # Fetch artist images
+    # Fetch artist images using optimized batch approach
     if request.artists:
-        for artist_name in request.artists:
-            try:
-                spotify_artist = await spotify_service.search_artist(artist_name)
-                if spotify_artist and spotify_artist.images:
-                    image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
-                    results["artist_images"][artist_name] = image_url
+        try:
+            # Use the optimized batch approach with database + batch API
+            artist_batch_data = await spotify_service.get_artists_batch_by_names(request.artists)
+            
+            for artist_name in request.artists:
+                if artist_name in artist_batch_data:
+                    spotify_artist = artist_batch_data[artist_name]
+                    if spotify_artist.images:
+                        image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
+                        results["artist_images"][artist_name] = image_url
+                    else:
+                        results["artist_images"][artist_name] = None
                 else:
                     results["artist_images"][artist_name] = None
-            except Exception as e:
-                print(f"Failed to fetch image for artist {artist_name}: {e}")
-                results["artist_images"][artist_name] = None
+        except Exception as e:
+            print(f"Batch artist fetching failed: {e}")
+            # Fallback to individual searches
+            for artist_name in request.artists:
+                try:
+                    spotify_artist = await spotify_service.search_artist(artist_name)
+                    if spotify_artist and spotify_artist.images:
+                        image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
+                        results["artist_images"][artist_name] = image_url
+                    else:
+                        results["artist_images"][artist_name] = None
+                except Exception as e2:
+                    print(f"Failed to fetch image for artist {artist_name}: {e2}")
+                    results["artist_images"][artist_name] = None
     
     # Fetch track images
     if request.tracks:
@@ -108,21 +125,39 @@ async def get_top_artists(
     # Only fetch images if explicitly requested
     if include_images:
         try:
-            # Use batch artist lookup by names - combines individual searches with batch API
+            # Fast: get artist names for ID lookup
             artist_names = [artist_data["artist_name"] for artist_data in artist_data_list]
-            batch_artists = await spotify_service.get_artists_batch_by_names(artist_names)
             
-            # Enhance artist data with images from batch results
-            for artist_data in artist_data_list:
-                artist_name = artist_data["artist_name"]
-                if artist_name in batch_artists:
-                    spotify_artist = batch_artists[artist_name]
-                    if spotify_artist.images:
-                        image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
-                        artist_data["image_url"] = image_url
+            # Fast: batch lookup of artist IDs from database
+            artist_id_data = db.query(Artist.name, Artist.spotify_id).filter(
+                Artist.name.in_(artist_names),
+                Artist.spotify_id.isnot(None)
+            ).all()
+            
+            # Create name -> ID mapping
+            name_to_id = {artist.name: artist.spotify_id for artist in artist_id_data}
+            artist_ids = list(name_to_id.values())
+            
+            if artist_ids:
+                # Batch API call
+                batch_artists = await spotify_batch_service.get_several_artists(artist_ids)
+                spotify_artist_map = {artist.id: artist for artist in batch_artists}
+                
+                # Update artist data with images and genres
+                for artist_data in artist_data_list:
+                    artist_name = artist_data["artist_name"]
+                    if artist_name in name_to_id:
+                        spotify_id = name_to_id[artist_name]
+                        if spotify_id in spotify_artist_map:
+                            spotify_artist = spotify_artist_map[spotify_id]
+                            artist_data["genres"] = spotify_artist.genres
+                            if spotify_artist.images:
+                                image_url = (spotify_artist.images[1].url if len(spotify_artist.images) > 1 
+                                           else spotify_artist.images[0].url)
+                                artist_data["image_url"] = image_url
         
         except Exception as e:
-            print(f"Batch artist fetching failed, falling back to individual searches: {e}")
+            print(f"Database + batch artist fetching failed, falling back to individual searches: {e}")
             # Fallback to individual searches if batch fails
             for artist_data in artist_data_list:
                 try:
