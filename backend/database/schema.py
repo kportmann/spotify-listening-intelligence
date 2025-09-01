@@ -1,10 +1,28 @@
-from sqlalchemy import Column, String, Text, Integer, BigInteger, Boolean, TIMESTAMP, ForeignKey, CheckConstraint, Index
+from sqlalchemy import Column, String, Text, Integer, BigInteger, Boolean, TIMESTAMP, ForeignKey, CheckConstraint, Index, JSON
 from sqlalchemy.dialects.postgresql import INET
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 Base = declarative_base()
+
+
+class Artist(Base):
+    __tablename__ = 'artists'
+    
+    spotify_id = Column(String(255), primary_key=True)
+    name = Column(Text, nullable=False)
+    genres = Column(JSON)  # Array of genre strings
+    href = Column(Text)  # Spotify API URL for the artist
+    created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
+    
+    # Relationship to tracks
+    tracks = relationship("Track", back_populates="artist")
+    
+    __table_args__ = (
+        CheckConstraint("spotify_id ~ '^[0-9A-Za-z]+$'", name='chk_artist_spotify_id_format'),
+        Index('idx_artists_name', 'name'),
+    )
 
 
 class Track(Base):
@@ -14,13 +32,16 @@ class Track(Base):
     name = Column(Text)
     artist_name = Column(Text)
     album_name = Column(Text)
+    artist_spotify_id = Column(String(255), ForeignKey('artists.spotify_id'))
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     
-    # Relationship to streams
+    # Relationships
+    artist = relationship("Artist", back_populates="tracks")
     streams = relationship("SpotifyStream", back_populates="track")
     
     __table_args__ = (
         CheckConstraint("spotify_uri ~ '^spotify:track:'", name='chk_track_uri_format'),
+        Index('idx_tracks_artist_spotify_id', 'artist_spotify_id'),
     )
 
 

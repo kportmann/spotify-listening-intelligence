@@ -3,6 +3,22 @@ from datetime import datetime
 from typing import Optional
 
 
+class ArtistRecord(BaseModel):
+    """Pydantic model for artist dimension table."""
+    
+    spotify_id: str
+    name: str
+    genres: Optional[list] = None
+    href: Optional[str] = None
+
+    @field_validator('spotify_id')
+    def validate_spotify_id(cls, v):
+        """Validate Spotify artist ID format."""
+        if v and not v.replace('-', '').replace('_', '').isalnum():
+            raise ValueError(f"Invalid Spotify artist ID: {v}")
+        return v
+
+
 class SpotifyStreamRecord(BaseModel):
     """Pydantic model for Spotify streaming history records."""
     
@@ -60,6 +76,7 @@ class TrackRecord(BaseModel):
     name: Optional[str] = None
     artist_name: Optional[str] = None
     album_name: Optional[str] = None
+    artist_spotify_id: Optional[str] = None
 
     @field_validator('spotify_uri')
     def validate_spotify_uri(cls, v):
