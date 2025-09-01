@@ -4,7 +4,9 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-content">
-        {/* Footer content will be added here */}
+        <span className="credits">
+          © 2025 Created by Kevin Portmann
+        </span>
       </div>
     </footer>
   );

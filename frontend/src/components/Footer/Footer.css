@@ -17,8 +17,14 @@
 .footer-content {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   width: 100%;
   color: #b3b3b3;
   font-size: 14px;
+}
+
+.credits {
+  color: #b3b3b3;
+  font-size: 12px;
+  opacity: 0.8;
 }
