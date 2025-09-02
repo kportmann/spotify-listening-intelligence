@@ -64,6 +64,15 @@
     padding: 1rem;
   }
   
+  .patterns-content {
+    padding: 1rem;
+    margin: 0 auto;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
   .page-title {
     font-size: 2rem;
   }
@@ -74,6 +83,23 @@
   
   .pattern-section {
     padding: 1.5rem;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .listening-patterns-page {
+    padding: 0.75rem;
   }
   
+  .patterns-content {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+  
+  .pattern-section {
+    padding: 1rem;
+  }
 }

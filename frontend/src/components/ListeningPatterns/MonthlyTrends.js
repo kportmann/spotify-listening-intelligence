@@ -41,12 +41,12 @@ export default function MonthlyTrends({ selectedYear = null }) {
   };
 
   const createLineChart = (data, maxValue, type = 'streams') => {
-    const chartWidth = 360;
-    const chartHeight = 120;
-    const leftPadding = 50;
-    const rightPadding = 20;
-    const topPadding = 20;
-    const bottomPadding = 25;
+    const chartWidth = 580;
+    const chartHeight = 260; 
+    const leftPadding = 60;
+    const rightPadding = 30;
+    const topPadding = 25;
+    const bottomPadding = 35;
     const innerWidth = chartWidth - leftPadding - rightPadding;
     const innerHeight = chartHeight - topPadding - bottomPadding;
 
@@ -262,7 +262,6 @@ export default function MonthlyTrends({ selectedYear = null }) {
                       textAnchor="end"
                       className="y-axis-label"
                       fill="rgba(255, 255, 255, 0.6)"
-                      fontSize="8"
                     >
                       {label.value}
                     </text>
@@ -287,7 +286,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                           style={{ cursor: 'pointer' }}
                         />
                         {isActive && (
-                          <text x={point.x} y={point.y - 12} textAnchor="middle" className="point-label" fill="#1db954" fontSize="10" fontWeight="600">
+                          <text x={point.x} y={point.y - 12} textAnchor="middle" className="point-label" fill="#1db954" fontWeight="600">
                             {point.month.stream_count.toLocaleString()}
                           </text>
                         )}
@@ -296,7 +295,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                   })}
                   
                   {streamsChart.points.map((point, index) => (
-                    <text key={`month-${index}`} x={point.x} y={streamsChart.chartHeight - 8} textAnchor="middle" className="month-label" fill="#b3b3b3" fontSize="9">
+                    <text key={`month-${index}`} x={point.x} y={streamsChart.chartHeight - 8} textAnchor="middle" className="month-label" fill="rgba(255, 255, 255, 0.6)">
                       {formatMonth(point.month.month_name)}
                     </text>
                   ))}
@@ -340,7 +339,6 @@ export default function MonthlyTrends({ selectedYear = null }) {
                       textAnchor="end"
                       className="y-axis-label"
                       fill="rgba(255, 255, 255, 0.6)"
-                      fontSize="8"
                     >
                       {label.value}
                     </text>
@@ -365,7 +363,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                           style={{ cursor: 'pointer' }}
                         />
                         {isActive && (
-                          <text x={point.x} y={point.y - 12} textAnchor="middle" className="point-label" fill="#1e88e5" fontSize="10" fontWeight="600">
+                          <text x={point.x} y={point.y - 12} textAnchor="middle" className="point-label" fill="#1e88e5" fontWeight="600">
                             {point.month.total_minutes.toLocaleString()}
                           </text>
                         )}
@@ -374,7 +372,7 @@ export default function MonthlyTrends({ selectedYear = null }) {
                   })}
                   
                   {minutesChart.points.map((point, index) => (
-                    <text key={`month-${index}`} x={point.x} y={minutesChart.chartHeight - 8} textAnchor="middle" className="month-label" fill="#b3b3b3" fontSize="9">
+                    <text key={`month-${index}`} x={point.x} y={minutesChart.chartHeight - 8} textAnchor="middle" className="month-label" fill="rgba(255, 255, 255, 0.6)">
                       {formatMonth(point.month.month_name)}
                     </text>
                   ))}
