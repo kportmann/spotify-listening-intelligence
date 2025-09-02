@@ -42,17 +42,4 @@ export const listeningPatternsService = {
     }
     return response.json();
   },
-
-  async getSkipRateAnalysis(year = null) {
-    const params = new URLSearchParams();
-    if (year) params.append('year', year);
-    
-    const url = `${API_BASE_URL}/listening-patterns/skip-rate-analysis${params.toString() ? '?' + params.toString() : ''}`;
-    
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch skip rate analysis data');
-    }
-    return response.json();
-  },
 };

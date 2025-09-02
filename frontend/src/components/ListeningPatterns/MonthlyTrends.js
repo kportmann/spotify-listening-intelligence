@@ -473,7 +473,6 @@ export default function MonthlyTrends({ selectedYear = null }) {
                   );
                 })()}
                 
-                {/* Skip Behavior Analysis */}
                 {(() => {
                   const avgMinutesPerStream = displayData.map(m => ({
                     month: m.month_name,

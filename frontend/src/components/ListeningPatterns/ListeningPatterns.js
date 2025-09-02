@@ -3,7 +3,6 @@ import './ListeningPatterns.css';
 import ListeningHeatmap from './ListeningHeatmap';
 import MonthlyTrends from './MonthlyTrends';
 import SeasonalTrends from './SeasonalTrends';
-import SkipRateAnalysis from './SkipRateAnalysis';
 import TimePeriodSelector from '../common/TimePeriodSelector/TimePeriodSelector';
 import PageHeader from '../common/PageHeader/PageHeader';
 
@@ -28,8 +27,6 @@ export default function ListeningPatterns() {
         <MonthlyTrends selectedYear={selectedPeriod === 'all_time' ? null : parseInt(selectedPeriod)} />
         
         <SeasonalTrends selectedYear={selectedPeriod === 'all_time' ? null : parseInt(selectedPeriod)} />
-        
-        <SkipRateAnalysis selectedYear={selectedPeriod === 'all_time' ? null : parseInt(selectedPeriod)} />
       </div>
     </div>
   );
