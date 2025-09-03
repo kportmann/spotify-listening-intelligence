@@ -9,6 +9,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedTimezone] = useState('UTC');
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const fetchSeasonalTrends = async () => {
@@ -62,6 +63,18 @@ export default function SeasonalTrends({ selectedYear = null }) {
     return (value / maxValue) * 100;
   };
 
+  const nextSeason = () => {
+    if (seasonalData?.seasonal_trends) {
+      setCurrentIndex((prev) => (prev + 1) % seasonalData.seasonal_trends.length);
+    }
+  };
+
+  const prevSeason = () => {
+    if (seasonalData?.seasonal_trends) {
+      setCurrentIndex((prev) => (prev - 1 + seasonalData.seasonal_trends.length) % seasonalData.seasonal_trends.length);
+    }
+  };
+
   if (loading) {
     return (
       <div className="seasonal-trends-container">
@@ -99,6 +112,59 @@ export default function SeasonalTrends({ selectedYear = null }) {
   }
 
   const maxValues = getMaxValues();
+  const seasons = seasonalData.seasonal_trends;
+  const currentSeason = seasons[currentIndex];
+
+  const renderSeasonCard = (season, seasonIndex, isMain = true) => {
+    const cardClass = isMain ? 'carousel-card carousel-card-main' : 'carousel-card carousel-card-teaser';
+    
+    return (
+      <div 
+        key={season.season} 
+        className={cardClass}
+      >
+        {isMain && (
+          <div className="carousel-image-container">
+            <div className="seasonal-icon-display">{getSeasonIcon(season.season)}</div>
+          </div>
+        )}
+        
+        {!isMain && (
+          <div className="carousel-image-container">
+            <div className="seasonal-icon-display">{getSeasonIcon(season.season)}</div>
+          </div>
+        )}
+        
+        <div className="carousel-content">
+          <h4 className="carousel-primary-text">{season.season}</h4>
+          {isMain && (
+            <p className="carousel-secondary-text">
+              {season.total_streams.toLocaleString()} streams • {season.total_minutes.toLocaleString()} minutes
+            </p>
+          )}
+        </div>
+        
+        {isMain && (
+          <div className="carousel-nav-buttons">
+            <button 
+              className="carousel-nav-btn carousel-nav-prev"
+              onClick={prevSeason}
+              aria-label="Previous season"
+            >
+              ◀
+            </button>
+            <button 
+              className="carousel-nav-btn carousel-nav-next"
+              onClick={nextSeason}
+              aria-label="Next season"
+            >
+              ▶
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="seasonal-trends-container">
@@ -110,71 +176,46 @@ export default function SeasonalTrends({ selectedYear = null }) {
         </SectionDescription>
       </div>
 
-      <div className="seasons-grid">
-        {seasonalData.seasonal_trends.map((season) => {
-          const colors = getSeasonColor(season.season);
-          
-          return (
-            <div 
-              key={season.season} 
-              className="season-card"
-              style={{ background: colors.bg, borderColor: colors.accent }}
-            >
-              <div className="season-header">
-                <div className="season-icon">{getSeasonIcon(season.season)}</div>
-                <h3 className="season-name" style={{ color: colors.accent }}>
-                  {season.season}
-                </h3>
-              </div>
-
-              <div className="season-stats">
-                <div className="stat-item">
-                  <div className="seasonal-stat-label">Total Streams</div>
-                  <div className="seasonal-stat-value">{season.total_streams.toLocaleString()}</div>
-                  <div className="stat-bar">
-                    <div 
-                      className="stat-progress streams-progress"
-                      style={{ 
-                        width: `${getProgressWidth(season.total_streams, maxValues.streams)}%`,
-                        backgroundColor: colors.accent 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div className="stat-item">
-                  <div className="seasonal-stat-label">Total Minutes</div>
-                  <div className="seasonal-stat-value">{season.total_minutes.toLocaleString()}</div>
-                  <div className="stat-bar">
-                    <div 
-                      className="stat-progress minutes-progress"
-                      style={{ 
-                        width: `${getProgressWidth(season.total_minutes, maxValues.minutes)}%`,
-                        backgroundColor: colors.accent,
-                        opacity: 0.8 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-
-                {season.years_covered > 1 && (
-                  <>
-                    <div className="stat-item">
-                      <div className="seasonal-stat-label">Avg Streams/Year</div>
-                      <div className="seasonal-stat-value">{season.avg_streams_per_year.toLocaleString()}</div>
-                    </div>
-
-                    <div className="stat-item">
-                      <div className="seasonal-stat-label">Avg Minutes/Year</div>
-                      <div className="seasonal-stat-value">{season.avg_minutes_per_year.toLocaleString()}</div>
-                    </div>
-                  </>
-                )}
-              </div>
+      <div className="carousel-wrapper">
+        <div className="carousel-content-area">
+          {seasons.length > 1 && (
+            <div className="carousel-teaser-left">
+              {renderSeasonCard(
+                seasons[(currentIndex - 1 + seasons.length) % seasons.length],
+                (currentIndex - 1 + seasons.length) % seasons.length,
+                false
+              )}
             </div>
-          );
-        })}
+          )}
+          
+          <div className="carousel-main">
+            {renderSeasonCard(currentSeason, currentIndex, true)}
+          </div>
+          
+          {seasons.length > 1 && (
+            <div className="carousel-teaser-right">
+              {renderSeasonCard(
+                seasons[(currentIndex + 1) % seasons.length],
+                (currentIndex + 1) % seasons.length,
+                false
+              )}
+            </div>
+          )}
+        </div>
       </div>
+      
+      {seasons.length > 1 && (
+        <div className="carousel-indicators">
+          {seasons.map((_, index) => (
+            <button
+              key={index}
+              className={`carousel-indicator ${index === currentIndex ? 'active' : ''}`}
+              onClick={() => setCurrentIndex(index)}
+              aria-label={`Go to ${seasons[index].season}`}
+            />
+          ))}
+        </div>
+      )}
 
     </div>
   );
