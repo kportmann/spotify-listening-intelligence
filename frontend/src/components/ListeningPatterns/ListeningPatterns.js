@@ -5,6 +5,7 @@ import MonthlyTrends from './MonthlyTrends';
 import SeasonalTrends from './SeasonalTrends';
 import TimePeriodSelector from '../common/TimePeriodSelector/TimePeriodSelector';
 import PageHeader from '../common/PageHeader/PageHeader';
+import WannaSeeMore from './StillWannaSeeMore';
 
 export default function ListeningPatterns() {
   const [selectedPeriod, setSelectedPeriod] = useState('all_time');
@@ -27,6 +28,8 @@ export default function ListeningPatterns() {
         <MonthlyTrends selectedYear={selectedPeriod === 'all_time' ? null : parseInt(selectedPeriod)} />
         
         <SeasonalTrends selectedYear={selectedPeriod === 'all_time' ? null : parseInt(selectedPeriod)} />
+
+        <WannaSeeMore />
       </div>
     </div>
   );

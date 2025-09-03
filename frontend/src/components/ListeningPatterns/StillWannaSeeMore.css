@@ -1,0 +1,50 @@
+.wanna-see-more {
+  margin: 3rem 0;
+  text-align: center;
+}
+
+
+.wanna-see-more-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.see-more-btn {
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.2);
+}
+
+.see-more-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(29, 185, 84, 0.3);
+  background: linear-gradient(135deg, #1ed760 0%, #1db954 100%);
+}
+
+.see-more-btn:active {
+  transform: translateY(0);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .wanna-see-more {
+    margin: 2rem 0;
+  }
+  
+  
+  .see-more-btn {
+    padding: 12px 28px;
+    font-size: 0.9rem;
+  }
+}
