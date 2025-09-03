@@ -6,7 +6,7 @@ from routers import basicAnalytics, musicAnalytics, podcastAnalytics, listeningP
 settings = get_settings()
 
 app = FastAPI(
-    title="Spotify Analytics API",
+    title="Spotify Listening Intelligence API",
     description="API for analyzing personal Spotify streaming data",
     version="1.0.0"
 )
@@ -26,7 +26,7 @@ app.include_router(listeningPatternsAnalytics.router, prefix="/api/v1/listening-
 
 @app.get("/")
 async def root():
-    return {"message": "Spotify Analytics API", "version": "1.0.0"}
+    return {"message": "Spotify Listening Intelligence API", "version": "1.0.0"}
 
 @app.get("/health")
 async def health_check():
