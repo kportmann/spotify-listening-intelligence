@@ -39,16 +39,6 @@ export default function SeasonalTrends({ selectedYear = null }) {
     }
   };
 
-  const getSeasonColor = (season) => {
-    switch (season) {
-      case 'Spring': return { bg: 'rgba(152, 251, 152, 0.2)', accent: '#98fb98' };
-      case 'Summer': return { bg: 'rgba(255, 215, 0, 0.2)', accent: '#ffd700' };
-      case 'Fall': return { bg: 'rgba(255, 140, 0, 0.2)', accent: '#ff8c00' };
-      case 'Winter': return { bg: 'rgba(173, 216, 230, 0.2)', accent: '#add8e6' };
-      default: return { bg: 'rgba(29, 185, 84, 0.2)', accent: '#1db954' };
-    }
-  };
-
   const getMaxValues = () => {
     if (!seasonalData?.seasonal_trends) return { streams: 0, minutes: 0 };
     
