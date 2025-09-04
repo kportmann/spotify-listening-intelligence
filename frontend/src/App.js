@@ -5,7 +5,7 @@ import Sidebar from './components/common/Sidebar/Sidebar';
 import MainContainer from './components/common/MainContainer/MainContainer';
 import Dashboard from './components/Dashboard/Dashboard';
 import ListeningPatterns from './components/ListeningPatterns/ListeningPatterns';
-import Footer from './components/Footer/Footer';
+import Footer from './components/common/Footer/Footer';
 
 function App() {
   return (
