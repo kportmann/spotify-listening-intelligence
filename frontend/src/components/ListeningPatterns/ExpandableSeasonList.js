@@ -1,50 +1,10 @@
 import { useEffect, useState } from 'react';
 import SeasonContentList from './SeasonContentList';
 import './ExpandableSeasonList.css';
-import { listeningPatternsService } from '../../services/listeningPatternsService';
+import { useSeasonalTopContent } from '../../hooks/useListeningPatterns';
 
 export default function ExpandableSeasonList({ selectedSeason, selectedYear = null, isExpanded = false }) {
-  const [contentBySeason, setContentBySeason] = useState({});
-
-  useEffect(() => {
-    if (!selectedSeason) return;
-    let isCancelled = false;
-
-    const fetchAll = async () => {
-      // initialize loading state
-      setContentBySeason((prev) => {
-        const base = {};
-        base[selectedSeason] = { ...(prev[selectedSeason] || {}), loading: true, error: null };
-        return base;
-      });
-
-      try {
-        const result = await listeningPatternsService
-          .getSeasonalTopContent(selectedSeason, selectedYear, true)
-          .then((data) => ({ season: selectedSeason, data }))
-          .catch((err) => ({ season: selectedSeason, error: err?.message || 'Failed to load' }));
-
-        if (isCancelled) return;
-        setContentBySeason((prev) => {
-          const next = { ...prev };
-          next[result.season] = {
-            data: result.data,
-            loading: false,
-            error: result.error || null,
-          };
-          return next;
-        });
-      } catch (e) {
-        // handled per-season above
-      }
-    };
-
-    fetchAll();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [selectedSeason, selectedYear]);
+  const { data, loading, error } = useSeasonalTopContent(selectedSeason, selectedYear, true);
 
   if (!selectedSeason) {
     return (
@@ -53,8 +13,6 @@ export default function ExpandableSeasonList({ selectedSeason, selectedYear = nu
       </div>
     );
   }
-
-  const selectedState = selectedSeason ? contentBySeason[selectedSeason] : null;
 
   return (
     <div className="expandable-list-container">
@@ -65,9 +23,9 @@ export default function ExpandableSeasonList({ selectedSeason, selectedYear = nu
       <div className="expandable-list-content">
         <SeasonContentList 
           title={selectedSeason}
-          data={selectedState?.data}
-          loading={selectedState?.loading && !selectedState?.data}
-          error={selectedState?.error}
+          data={data}
+          loading={loading && !data}
+          error={error}
           isExpanded={isExpanded}
         />
       </div>

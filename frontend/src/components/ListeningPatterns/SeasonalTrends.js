@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './SeasonalTrends.css';
-import { listeningPatternsService } from '../../services/listeningPatternsService';
+import { useSeasonalTrends } from '../../hooks/useListeningPatterns';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
 import SectionDescription from '../common/SectionDescription/SectionDescription';
 import ExpandableSeasonList from './ExpandableSeasonList';
@@ -8,29 +8,14 @@ import ExpandButton from '../common/ExpandButton/ExpandButton';
 
 export default function SeasonalTrends({ selectedYear = null }) {
   const [seasonalData, setSeasonalData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedTimezone] = useState('UTC');
+  const { data, loading, error } = useSeasonalTrends(selectedYear, selectedTimezone);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    const fetchSeasonalTrends = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await listeningPatternsService.getSeasonalTrends(selectedYear, selectedTimezone);
-        setSeasonalData(data);
-      } catch (err) {
-        console.error('Failed to fetch seasonal trends:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSeasonalTrends();
-  }, [selectedYear, selectedTimezone]);
+    setSeasonalData(data);
+  }, [data]);
 
   const getSeasonIcon = (season) => {
     switch (season) {

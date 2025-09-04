@@ -1,35 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import './MonthlyTrends.css';
-import { listeningPatternsService } from '../../services/listeningPatternsService';
+import { useMonthlyTrends } from '../../hooks/useListeningPatterns';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
 import SectionDescription from '../common/SectionDescription/SectionDescription';
 
 export default function MonthlyTrends({ selectedYear = null }) {
   const [monthlyData, setMonthlyData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedTimezone] = useState('UTC');
+  const { data, loading, error } = useMonthlyTrends(selectedYear, selectedTimezone);
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [showInsights, setShowInsights] = useState(false);
 
   useEffect(() => {
-    const fetchMonthlyTrends = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        setActiveTooltip(null); // Close any open tooltips when switching years
-        const data = await listeningPatternsService.getMonthlyTrends(selectedYear, selectedTimezone);
-        setMonthlyData(data);
-      } catch (err) {
-        console.error('Failed to fetch monthly trends:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMonthlyTrends();
-  }, [selectedYear, selectedTimezone]);
+    setActiveTooltip(null);
+    setMonthlyData(data);
+  }, [data]);
 
   const getMaxValues = () => {
     if (!monthlyData?.monthly_trends) return { streams: 0, minutes: 0 };

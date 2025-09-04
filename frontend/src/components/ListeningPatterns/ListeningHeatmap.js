@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './ListeningHeatmap.css';
-import { listeningPatternsService } from '../../services/listeningPatternsService';
+import { useListeningHeatmap } from '../../hooks/useListeningPatterns';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
 import SectionDescription from '../common/SectionDescription/SectionDescription';
 
 export default function ListeningHeatmap({ selectedYear = null }) {
-  const [heatmapData, setHeatmapData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [hoveredCell, setHoveredCell] = useState(null);
   const [selectedTimezone, setSelectedTimezone] = useState('Europe/Zurich');
+  const { data: heatmapData, loading, error } = useListeningHeatmap(selectedYear, selectedTimezone);
 
   const timezoneOptions = [
     { value: 'UTC', label: 'UTC' },
@@ -20,23 +18,7 @@ export default function ListeningHeatmap({ selectedYear = null }) {
     { value: 'Asia/Tokyo', label: 'Asia/Tokyo (JST)' },
   ];
 
-  useEffect(() => {
-    const fetchHeatmapData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await listeningPatternsService.getListeningHeatmap(selectedYear, selectedTimezone);
-        setHeatmapData(data);
-      } catch (err) {
-        console.error('Failed to fetch heatmap data:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHeatmapData();
-  }, [selectedYear, selectedTimezone]);
+  
 
   const getIntensityColor = (value, maxValue, type = 'streams') => {
     if (!value || maxValue === 0) return 'rgba(29, 185, 84, 0.1)';
