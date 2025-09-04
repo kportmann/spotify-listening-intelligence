@@ -42,4 +42,19 @@ export const listeningPatternsService = {
     }
     return response.json();
   },
+
+  async getSeasonalTopContent(season, year = null, includeImages = true) {
+    const params = new URLSearchParams();
+    params.append('season', season);
+    if (year) params.append('year', year);
+    if (includeImages) params.append('include_images', 'true');
+
+    const url = `${API_BASE_URL}/listening-patterns/seasonal-top-content?${params.toString()}`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to fetch seasonal top content');
+    }
+    return response.json();
+  },
 };

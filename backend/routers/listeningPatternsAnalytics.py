@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import func, extract, case
+from sqlalchemy import func, extract, desc
 from database.connection import get_db
-from database.schema import SpotifyStream
+from database.schema import SpotifyStream, Track, Artist
+from services.spotify_batch_service import spotify_batch_service
+from services.spotify_service import spotify_service
 from pydantic import BaseModel, Field, field_validator, computed_field, ConfigDict
 from typing import Optional, List
 from datetime import datetime, timezone as dt_timezone
@@ -155,11 +157,52 @@ class SeasonalTrendsResponse(BaseModel):
     seasonal_trends: List[SeasonalTrendData] = Field(..., description="Seasonal listening trends data")
     peak_season: PeakSeasonData = Field(..., description="Peak season information")
 
+class GenreStat(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    genre: str = Field(..., description="Genre name")
+    total_ms: int = Field(..., description="Total milliseconds for this genre")
+
+    @computed_field
+    @property
+    def total_minutes(self) -> int:
+        return round(self.total_ms / (1000 * 60))
 
 
+class SeasonalTopArtist(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    artist_name: str
+    total_ms: int
+    play_count: int
+    image_url: Optional[str] = None
+    genres: Optional[List[str]] = None
 
+    @computed_field
+    @property
+    def total_hours(self) -> float:
+        return round(self.total_ms / (1000 * 60 * 60), 1)
 
+class SeasonalTopTrack(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    track_name: str
+    artist_name: str
+    album_name: Optional[str] = None
+    total_ms: int
+    play_count: int
+    image_url: Optional[str] = None
 
+    @computed_field
+    @property
+    def total_hours(self) -> float:
+        return round(self.total_ms / (1000 * 60 * 60), 1)
+
+class SeasonalTopContentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    season: Season
+    year: Optional[int] = None
+    top_artist: Optional[SeasonalTopArtist] = None
+    top_track: Optional[SeasonalTopTrack] = None
+    primary_genre: Optional[str] = None
+    top_genres: List[GenreStat] = []
 
 
 # Error response models
@@ -204,9 +247,9 @@ async def get_listening_heatmap(
         # Convert UTC timestamps to specified timezone
         ts_converted = func.timezone(query_params.timezone, SpotifyStream.ts)
     
-    # Get listening data grouped by day of week (0=Monday) and hour of day
+    # Get listening data grouped by day of week (PostgreSQL: 0=Sunday..6=Saturday) and hour of day
     heatmap_data = base_query.with_entities(
-        extract('dow', ts_converted).label('day_of_week'),  # 0=Sunday, 1=Monday, etc.
+        extract('dow', ts_converted).label('day_of_week'),  # PostgreSQL: 0=Sunday..6=Saturday
         extract('hour', ts_converted).label('hour_of_day'),
         func.count(SpotifyStream.id).label('stream_count'),
         func.sum(SpotifyStream.ms_played).label('total_ms')
@@ -480,5 +523,181 @@ async def get_seasonal_trends(
                 total_streams=peak_season_by_streams.total_streams if peak_season_by_streams else None
             )
         )
+    )
+
+@router.get("/seasonal-top-content", response_model=SeasonalTopContentResponse)
+async def get_seasonal_top_content(
+    season: Season,
+    year: Optional[int] = None,
+    include_images: bool = False,
+    refresh_cache: bool = False,
+    db: Session = Depends(get_db)
+) -> SeasonalTopContentResponse:
+    """Get top artist, top track and predominant genres for a given season.
+
+    - Season months mapping:
+      Spring: 3,4,5; Summer: 6,7,8; Fall: 9,10,11; Winter: 12,1,2
+    """
+
+    # Basic validation (defaults to UTC internally)
+    try:
+        _ = ListeningAnalyticsQuery(year=year)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+    months_by_season = {
+        Season.SPRING: [3, 4, 5],
+        Season.SUMMER: [6, 7, 8],
+        Season.FALL: [9, 10, 11],
+        Season.WINTER: [12, 1, 2],
+    }
+
+    months = months_by_season[season]
+
+    # Base query and time conversions
+    base_query = db.query(SpotifyStream).filter(
+        SpotifyStream.spotify_track_uri.isnot(None)
+    )
+
+    if year:
+        base_query = base_query.filter(extract('year', SpotifyStream.ts) == year)
+
+    # For month filtering (UTC timestamps stored in DB)
+    ts_converted = SpotifyStream.ts
+
+    # Top Artist within season
+    top_artist_row = base_query.with_entities(
+        SpotifyStream.master_metadata_album_artist_name.label('artist_name'),
+        func.sum(SpotifyStream.ms_played).label('total_ms'),
+        func.count(SpotifyStream.id).label('play_count')
+    ).filter(
+        extract('month', ts_converted).in_(months),
+        SpotifyStream.master_metadata_album_artist_name.isnot(None)
+    ).group_by(
+        SpotifyStream.master_metadata_album_artist_name
+    ).order_by(desc('total_ms')).limit(1).first()
+
+    top_artist_model: Optional[SeasonalTopArtist] = None
+    if top_artist_row:
+        top_artist_model = SeasonalTopArtist(
+            artist_name=top_artist_row.artist_name,
+            total_ms=int(top_artist_row.total_ms or 0),
+            play_count=int(top_artist_row.play_count or 0),
+        )
+
+        # Enrich with genres and image if requested
+        try:
+            artist_record = db.query(Artist).filter(Artist.name == top_artist_model.artist_name).first()
+            if artist_record:
+                top_artist_model.genres = artist_record.genres
+                if include_images and artist_record.spotify_id:
+                    batch_artists = await spotify_batch_service.get_several_artists([artist_record.spotify_id])
+                    if batch_artists:
+                        spotify_artist = batch_artists[0]
+                        if spotify_artist.images:
+                            image_url = (
+                                spotify_artist.images[1].url
+                                if len(spotify_artist.images) > 1
+                                else spotify_artist.images[0].url
+                            )
+                            top_artist_model.image_url = image_url
+            elif include_images:
+                # Fallback search by name
+                spotify_artist = await spotify_service.search_artist(top_artist_model.artist_name, refresh_cache=refresh_cache)
+                if spotify_artist and spotify_artist.images:
+                    image_url = spotify_artist.images[1].url if len(spotify_artist.images) > 1 else spotify_artist.images[0].url
+                    top_artist_model.image_url = image_url
+                if spotify_artist and spotify_artist.genres:
+                    top_artist_model.genres = spotify_artist.genres
+        except Exception as e:
+            print(f"Failed to enrich top artist: {e}")
+
+    # Top Track within season
+    top_track_row = base_query.with_entities(
+        SpotifyStream.master_metadata_track_name.label('track_name'),
+        SpotifyStream.master_metadata_album_artist_name.label('artist_name'),
+        SpotifyStream.master_metadata_album_album_name.label('album_name'),
+        SpotifyStream.spotify_track_uri.label('track_uri'),
+        func.sum(SpotifyStream.ms_played).label('total_ms'),
+        func.count(SpotifyStream.id).label('play_count')
+    ).filter(
+        extract('month', ts_converted).in_(months),
+        SpotifyStream.master_metadata_track_name.isnot(None)
+    ).group_by(
+        SpotifyStream.master_metadata_track_name,
+        SpotifyStream.master_metadata_album_artist_name,
+        SpotifyStream.master_metadata_album_album_name,
+        SpotifyStream.spotify_track_uri
+    ).order_by(desc('total_ms')).limit(1).first()
+
+    top_track_model: Optional[SeasonalTopTrack] = None
+    if top_track_row:
+        top_track_model = SeasonalTopTrack(
+            track_name=top_track_row.track_name,
+            artist_name=top_track_row.artist_name,
+            album_name=top_track_row.album_name,
+            total_ms=int(top_track_row.total_ms or 0),
+            play_count=int(top_track_row.play_count or 0)
+        )
+
+        # Enrich with image if requested
+        try:
+            if include_images and top_track_row.track_uri:
+                batch_tracks = await spotify_batch_service.get_tracks_from_uris([top_track_row.track_uri])
+                if batch_tracks:
+                    spotify_track = batch_tracks[0]
+                    if spotify_track.album_images:
+                        image_url = (
+                            spotify_track.album_images[1].url
+                            if len(spotify_track.album_images) > 1
+                            else spotify_track.album_images[0].url
+                        )
+                        top_track_model.image_url = image_url
+        except Exception as e:
+            print(f"Failed to enrich top track: {e}")
+
+    # Top genres within season
+    genre_minutes: dict[str, int] = {}
+    try:
+        artist_minutes_rows = db.query(
+            Artist.name,
+            Artist.genres,
+            func.sum(SpotifyStream.ms_played).label('total_ms')
+        ).join(
+            Track, Artist.spotify_id == Track.artist_spotify_id
+        ).join(
+            SpotifyStream, SpotifyStream.spotify_track_uri == Track.spotify_uri
+        ).filter(
+            SpotifyStream.spotify_track_uri.isnot(None),
+            extract('month', ts_converted).in_(months)
+        ).group_by(Artist.name, Artist.genres).all()
+
+        for row in artist_minutes_rows:
+            total_ms = int(row.total_ms or 0)
+            if not row.genres:
+                continue
+            for genre in row.genres:
+                if not genre:
+                    continue
+                genre_minutes[genre] = genre_minutes.get(genre, 0) + total_ms
+    except Exception as e:
+        print(f"Failed to compute top genres: {e}")
+
+    # Sort and prepare top genres
+    sorted_genres = sorted(
+        [GenreStat(genre=g, total_ms=ms) for g, ms in genre_minutes.items()],
+        key=lambda x: x.total_ms,
+        reverse=True
+    )
+
+    primary_genre = sorted_genres[0].genre if sorted_genres else None
+
+    return SeasonalTopContentResponse(
+        season=season,
+        year=year,
+        top_artist=top_artist_model,
+        top_track=top_track_model,
+        primary_genre=primary_genre,
+        top_genres=sorted_genres[:10]
     )
 

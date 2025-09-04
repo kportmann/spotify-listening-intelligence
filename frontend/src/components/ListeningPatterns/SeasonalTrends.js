@@ -3,6 +3,8 @@ import './SeasonalTrends.css';
 import { listeningPatternsService } from '../../services/listeningPatternsService';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
 import SectionDescription from '../common/SectionDescription/SectionDescription';
+import ExpandableSeasonList from './ExpandableSeasonList';
+import ExpandButton from '../common/ExpandButton/ExpandButton';
 
 export default function SeasonalTrends({ selectedYear = null }) {
   const [seasonalData, setSeasonalData] = useState(null);
@@ -10,6 +12,7 @@ export default function SeasonalTrends({ selectedYear = null }) {
   const [error, setError] = useState(null);
   const [selectedTimezone] = useState('UTC');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const fetchSeasonalTrends = async () => {
@@ -205,6 +208,21 @@ export default function SeasonalTrends({ selectedYear = null }) {
             />
           ))}
         </div>
+      )}
+
+      <ExpandButton 
+        isExpanded={isExpanded}
+        onClick={() => setIsExpanded((prev) => !prev)}
+        isLoading={false}
+        disabled={false}
+      />
+
+      {isExpanded && (
+        <ExpandableSeasonList 
+          selectedSeason={currentSeason?.season}
+          selectedYear={selectedYear}
+          isExpanded={isExpanded}
+        />
       )}
 
     </div>

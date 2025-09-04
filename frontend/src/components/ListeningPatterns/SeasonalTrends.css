@@ -113,8 +113,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 2; /* supported in WebKit */
   -webkit-box-orient: vertical;
 }
 
@@ -204,6 +203,11 @@
   justify-content: center;
   gap: 0.5rem;
   margin-top: 1rem;
+}
+
+/* Match dashboard spacing for expand button under the carousel */
+.seasonal-trends-container .expand-button-wrapper {
+  margin: 2rem 0 1.5rem;
 }
 
 .carousel-indicator {
@@ -355,8 +359,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
+    -webkit-line-clamp: 3; /* supported in WebKit */
     -webkit-box-orient: vertical;
   }
   
