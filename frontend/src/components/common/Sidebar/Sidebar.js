@@ -9,6 +9,7 @@ function Sidebar() {
   const menuItems = [
     { label: 'Dashboard', path: '/', active: location.pathname === '/' },
     { label: 'Listening Patterns', path: '/listening-patterns', active: location.pathname === '/listening-patterns' },
+    { label: 'Discovery and Variety', path: '/discovery-and-variety', active: location.pathname === '/discovery-and-variety' },
   ];
 
   const toggleSidebar = () => {

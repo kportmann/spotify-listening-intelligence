@@ -5,8 +5,8 @@ import './StillWannaSeeMore.css';
 export default function WannaSeeMore() {
   const navigate = useNavigate();
 
-  const handleListeningPatternsClick = () => {
-    navigate('/');
+  const handleDiscoveryAndVarietyClick = () => {
+    navigate('/discovery-and-variety');
   };
 
   return (
@@ -15,9 +15,9 @@ export default function WannaSeeMore() {
       <div className="wanna-see-more-buttons">
         <button
           className="see-more-btn"
-          onClick={handleListeningPatternsClick}
+          onClick={handleDiscoveryAndVarietyClick}
         >
-          Back
+          Discovery and Variety
         </button>
       </div>
     </div>

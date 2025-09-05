@@ -9,6 +9,10 @@ export default function WannaSeeMore() {
     navigate('/listening-patterns');
   };
 
+  const handleDiscoveryAndVarietyClick = () => {
+    navigate('/discovery-and-variety');
+  };
+
   return (
     <div className="wanna-see-more">
       <SectionTitle title="Wanna see more?" />
@@ -18,6 +22,12 @@ export default function WannaSeeMore() {
           onClick={handleListeningPatternsClick}
         >
           Listening Patterns
+        </button>
+        <button
+          className="see-more-btn"
+          onClick={handleDiscoveryAndVarietyClick}
+        >
+          Discovery and Variety
         </button>
       </div>
     </div>

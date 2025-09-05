@@ -5,6 +5,7 @@ import Sidebar from './components/common/Sidebar/Sidebar';
 import MainContainer from './components/common/MainContainer/MainContainer';
 import Dashboard from './components/Dashboard/Dashboard';
 import ListeningPatterns from './components/ListeningPatterns/ListeningPatterns';
+import DiscoveryAndVariety from './components/DiscoveryAndVariety/DiscoveryAndVariety';
 import Footer from './components/common/Footer/Footer';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/listening-patterns" element={<ListeningPatterns />} />
+            <Route path="/discovery-and-variety" element={<DiscoveryAndVariety />} />
           </Routes>
         </MainContainer>
         <Footer />
