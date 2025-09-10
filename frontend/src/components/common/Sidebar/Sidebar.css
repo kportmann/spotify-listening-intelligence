@@ -75,6 +75,79 @@
   border-left: 3px solid #1db954;
 }
 
+/* Group and submenu styles */
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 12px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #b3b3b3;
+  transition: all 0.2s ease;
+  position: relative;
+  border-left: 3px solid transparent;
+}
+
+.nav-group-toggle:hover {
+  color: #ffffff;
+  background-color: #1a1a1a;
+}
+
+.nav-group-toggle .caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 6px solid #b3b3b3;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.2s ease, border-left-color 0.2s ease;
+}
+
+.nav-group-toggle.expanded .caret {
+  transform: rotate(90deg);
+  border-left-color: #1db954;
+}
+
+.nav-submenu {
+  display: flex;
+  flex-direction: column;
+  padding-left: 12px;
+  border-left: 1px dashed #333333;
+  margin-left: 10px;
+  gap: 4px;
+}
+
+.nav-subitem {
+  padding: 10px 12px;
+  border-radius: 4px;
+  color: #b3b3b3;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-subitem:hover {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.nav-subitem.active {
+  color: #ffffff;
+  background-color: #1a1a1a;
+  border-left: 3px solid #1db954;
+}
 
 @media (max-width: 768px) {
   .sidebar {

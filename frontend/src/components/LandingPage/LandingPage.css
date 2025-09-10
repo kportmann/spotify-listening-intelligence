@@ -1,0 +1,81 @@
+.landing-page {
+    display: grid;
+    gap: 24px;
+  }
+  
+  .landing-hero {
+    text-align: center;
+    padding: 24px 8px 0 8px;
+  }
+  
+  .landing-title {
+    margin: 0 0 8px 0;
+    font-size: 32px;
+  }
+  
+  .landing-subtitle {
+    margin: 0;
+    color: #b3b3b3;
+  }
+  
+  .landing-options {
+    display: grid;
+    grid-template-columns: repeat(2, 320px);
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .landing-card {
+    background: #1a1a1a;
+    border: 1px solid #282828;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 320px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    color: #ffffff;
+  }
+  
+  .landing-card:hover {
+    transform: translateY(-1px);
+    background: radial-gradient(800px 400px at 20% 10%, #1db95444 0%, transparent 60%),
+                radial-gradient(700px 500px at 80% 80%, #1ed76022 0%, transparent 60%),
+                #202020;
+    border-color: #333333;
+  }
+  
+
+  .landing-card-accent:hover {
+    background: radial-gradient(1000px 600px at 20% 20%, #1db95455 0%, transparent 60%),
+                radial-gradient(800px 600px at 80% 80%, #1ed76033 0%, transparent 60%),
+                #202020;
+  }
+  
+  .landing-card-badge {
+    display: inline-block;
+    background: #1db954;
+    color: #000;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  
+  .landing-card-title {
+    margin: 0 0 6px 0;
+    font-size: 22px;
+  }
+  
+  .landing-card-desc {
+    margin: 0;
+    color: #c7c7c7;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .landing-options {
+      grid-template-columns: 1fr;
+      justify-content: stretch;
+    }
+  }

@@ -4,16 +4,19 @@ import './Sidebar.css';
 
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDashboardOpen, setIsDashboardOpen] = useState(true);
   const location = useLocation();
   
-  const menuItems = [
-    { label: 'Dashboard', path: '/', active: location.pathname === '/' },
-    { label: 'Listening Patterns', path: '/listening-patterns', active: location.pathname === '/listening-patterns' },
-    { label: 'Discovery and Variety', path: '/discovery-and-variety', active: location.pathname === '/discovery-and-variety' },
-  ];
+  const dashboardActive = 
+    location.pathname.startsWith('/dashboard') ||
+    location.pathname === '/listening-patterns' ||
+    location.pathname === '/discovery-and-variety';
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
+  };
+  const toggleDashboard = () => {
+    setIsDashboardOpen(!isDashboardOpen);
   };
 
   return (
@@ -27,15 +30,46 @@ function Sidebar() {
       </button>
       <div className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
         <nav className="nav-menu">
-          {menuItems.map((item, index) => (
-            <Link 
-              key={index} 
-              to={item.path}
-              className={`nav-item ${item.active ? 'active' : ''}`}
+          <Link 
+            to="/"
+            className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}
+          >
+            Home
+          </Link>
+
+          <div className={`nav-group ${dashboardActive ? 'active' : ''}`}>
+            <button 
+              className={`nav-item nav-group-toggle ${isDashboardOpen ? 'expanded' : ''}`}
+              onClick={toggleDashboard}
+              aria-expanded={isDashboardOpen}
+              aria-controls="dashboard-submenu"
             >
-              {item.label}
-            </Link>
-          ))}
+              <span className="caret" />
+              Dashboard
+            </button>
+            {isDashboardOpen && (
+              <div id="dashboard-submenu" className="nav-submenu">
+                <Link 
+                  to="/dashboard"
+                  className={`nav-subitem ${location.pathname === '/dashboard' ? 'active' : ''}`}
+                >
+                  Top Content
+                </Link>
+                <Link 
+                  to="/listening-patterns"
+                  className={`nav-subitem ${location.pathname === '/listening-patterns' ? 'active' : ''}`}
+                >
+                  Listening Patterns
+                </Link>
+                <Link 
+                  to="/discovery-and-variety"
+                  className={`nav-subitem ${location.pathname === '/discovery-and-variety' ? 'active' : ''}`}
+                >
+                  Discovery & Variety
+                </Link>
+              </div>
+            )}
+          </div>
         </nav>
       </div>
       {isOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
