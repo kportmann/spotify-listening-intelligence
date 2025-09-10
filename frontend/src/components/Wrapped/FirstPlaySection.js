@@ -65,7 +65,7 @@ export default function FirstPlaySection() {
             </div>
             <div className="first-play-meta">
               <p className="first-play-story">
-                You pressed play on “{firstPlay.track_name}” by {firstPlay.artist_name}.
+                You pressed play on “{firstPlay.track_name}” by {firstPlay.artist_name}.<br />
                 That first listen kicked off your streaming journey.
               </p>
             </div>
@@ -74,6 +74,11 @@ export default function FirstPlaySection() {
         {!loading && (!firstPlay || !firstPlay.played_at) && (
           <p>We couldn't find your first play yet.</p>
         )}
+      </div>
+      <div className="wrapped-scroll-indicator" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     </section>
   );

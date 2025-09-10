@@ -9,11 +9,17 @@
 .wrapped-hero h1 {
   font-size: clamp(40px, 8vw, 96px);
   margin: 0 0 16px 0;
+  font-weight: 600;
+  background: linear-gradient(to bottom right, #8424E3, #DD2476);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .wrapped-hero p {
   font-size: clamp(16px, 2.5vw, 24px);
-  opacity: 0.85;
+  color: #b3b3b3;
+  opacity: 1;
   margin: 0;
 }
 

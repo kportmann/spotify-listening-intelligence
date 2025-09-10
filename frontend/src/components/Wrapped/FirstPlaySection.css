@@ -9,15 +9,16 @@
   font-size: clamp(22px, 4vw, 40px);
   line-height: 1.15;
   letter-spacing: 0.4px;
-  color: #ffffff;
+  background: linear-gradient(to bottom right, #8424E3, #DD2476);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .first-play-card {
   display: inline-flex;
   align-items: center;
   gap: 28px;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
-  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 28px 32px;
   border-radius: 20px;
   backdrop-filter: blur(8px);
