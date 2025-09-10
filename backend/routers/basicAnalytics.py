@@ -67,6 +67,13 @@ class AvailableYearsResponse(BaseModel):
             return None
         return f"{min(self.years)}-{max(self.years)}" if len(self.years) > 1 else str(self.years[0])
 
+class FirstPlayResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    track_name: Optional[str] = Field(None, description="First track name")
+    artist_name: Optional[str] = Field(None, description="First artist name")
+    played_at: Optional[str] = Field(None, description="ISO timestamp of first play")
+
+
 @router.get("/stats/overview", response_model=StatsOverviewResponse)
 async def get_stats_overview(
     year: Optional[int] = None, 
@@ -176,4 +183,23 @@ async def get_available_years(db: Session = Depends(get_db)) -> AvailableYearsRe
     return AvailableYearsResponse(
         years=years,
         total_years=len(years)
+    )
+
+@router.get("/stats/first-play", response_model=FirstPlayResponse)
+async def get_first_play(
+    db: Session = Depends(get_db)
+) -> FirstPlayResponse:
+    """Return the first played song (track, artist) and when it began."""
+
+    first_row = db.query(SpotifyStream).\
+        filter(SpotifyStream.spotify_track_uri.isnot(None)).\
+        order_by(SpotifyStream.ts.asc()).\
+        limit(1).\
+        first()
+    if not first_row:
+        return FirstPlayResponse(track_name=None, artist_name=None, played_at=None)
+    return FirstPlayResponse(
+        track_name=first_row.master_metadata_track_name,
+        artist_name=first_row.master_metadata_album_artist_name,
+        played_at=first_row.ts.isoformat() if first_row.ts else None
     )

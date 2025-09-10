@@ -38,4 +38,16 @@ export const musicService = {
   async getTopTracksWithImages(period = 'all_time', limit = 100, refreshCache = false) {
     return this.getTopTracks(period, limit, true, refreshCache);
   }
+  ,
+  async getImagesBatch({ artists = null, tracks = null } = {}) {
+    const response = await fetch(`${API_BASE_URL}/music/images/batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ artists, tracks })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch images batch');
+    }
+    return response.json();
+  }
 };

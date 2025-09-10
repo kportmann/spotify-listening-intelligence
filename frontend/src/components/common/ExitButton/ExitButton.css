@@ -1,0 +1,33 @@
+.exit-button {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.1s ease;
+  z-index: 1000;
+  backdrop-filter: blur(6px);
+}
+
+.exit-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.exit-button:active {
+  transform: scale(0.98);
+}
+
+.exit-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
+}
+
+

@@ -20,4 +20,12 @@ export const basicStatsService = {
     }
     return response.json();
   },
+
+  async getFirstPlay() {
+    const response = await fetch(`${API_BASE_URL}/basicStats/stats/first-play`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch first play');
+    }
+    return response.json();
+  },
 };

@@ -1,0 +1,21 @@
+.wrapped-immersive {
+  height: 100vh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(30, 215, 96, 0.35) 0%, rgba(30, 215, 96, 0) 70%),
+    radial-gradient(1000px 500px at -10% 100%, rgba(29, 185, 84, 0.35) 0%, rgba(29, 185, 84, 0) 70%),
+    #121212;
+  color: #ffffff;
+}
+
+.wrapped-section {
+  min-height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+
