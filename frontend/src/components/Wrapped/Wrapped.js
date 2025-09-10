@@ -3,6 +3,7 @@ import ExitButton from '../common/ExitButton/ExitButton';
 import HeroSection from './HeroSection';
 import FirstPlaySection from './FirstPlaySection';
 import FoundationSection from './FoundationSection';
+import CostSection from './CostSection';
 
 export default function Wrapped() {
   return (
@@ -11,6 +12,7 @@ export default function Wrapped() {
       <HeroSection />
       <FirstPlaySection />
       <FoundationSection />
+      <CostSection />
     </div>
   );
 }
