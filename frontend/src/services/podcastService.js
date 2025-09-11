@@ -1,62 +1,46 @@
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+import { http } from './http/client';
 
 export const podcastService = {
-  async getTopEpisodes(period = 'all_time', limit = 10, includeImages = false) {
-    const response = await fetch(`${API_BASE_URL}/podcasts/top/episodes?period=${period}&limit=${limit}&include_images=${includeImages}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch top episodes');
-    }
-    return response.json();
+  getTopEpisodes(period = 'all_time', limit = 10, includeImages = false) {
+    return http.get('/podcasts/top/episodes', {
+      params: { period, limit, include_images: includeImages },
+      cacheTtlMs: 60000,
+    });
   },
 
-  async getTopShows(period = 'all_time', limit = 10, includeImages = false) {
-    const response = await fetch(`${API_BASE_URL}/podcasts/top/shows?period=${period}&limit=${limit}&include_images=${includeImages}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch top shows');
-    }
-    return response.json();
+  getTopShows(period = 'all_time', limit = 10, includeImages = false) {
+    return http.get('/podcasts/top/shows', {
+      params: { period, limit, include_images: includeImages },
+      cacheTtlMs: 60000,
+    });
   },
 
-  async getTopAudiobooks(period = 'all_time', limit = 10) {
-    const response = await fetch(`${API_BASE_URL}/podcasts/top/audiobooks?period=${period}&limit=${limit}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch top audiobooks');
-    }
-    return response.json();
+  getTopAudiobooks(period = 'all_time', limit = 10) {
+    return http.get('/podcasts/top/audiobooks', {
+      params: { period, limit },
+      cacheTtlMs: 60000,
+    });
   },
 
-  async getImagesForPodcasts(episodes = [], shows = []) {
-    const response = await fetch(`${API_BASE_URL}/podcasts/images/batch`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+  getImagesForPodcasts(episodes = [], shows = []) {
+    return http.post('/podcasts/images/batch', {
+      body: {
         episodes: episodes.map(episode => ({
           episode_name: episode.episode_name,
-          show_name: episode.show_name
+          show_name: episode.show_name,
         })),
-        shows
-      })
+        shows,
+      },
     });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch podcast images');
-    }
-    return response.json();
   },
 
   async getAllTopPodcastContent(period = 'all_time', limit = 5, includeImages = true) {
     const [episodes, shows, audiobooks] = await Promise.all([
       this.getTopEpisodes(period, limit, includeImages),
       this.getTopShows(period, limit, includeImages),
-      this.getTopAudiobooks(period, limit)
+      this.getTopAudiobooks(period, limit),
     ]);
 
-    return {
-      episodes,
-      shows,
-      audiobooks
-    };
-  }
+    return { episodes, shows, audiobooks };
+  },
 };

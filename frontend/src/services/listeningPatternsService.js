@@ -1,60 +1,32 @@
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+import { http } from './http/client';
 
 export const listeningPatternsService = {
-  async getListeningHeatmap(year = null, timezone = 'UTC') {
-    const params = new URLSearchParams();
-    if (year) params.append('year', year);
-    if (timezone !== 'UTC') params.append('timezone', timezone);
-    
-    const url = `${API_BASE_URL}/listening-patterns/listening-heatmap${params.toString() ? '?' + params.toString() : ''}`;
-    
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch listening heatmap data');
-    }
-    return response.json();
+  getListeningHeatmap(year = null, timezone = 'UTC') {
+    const params = {
+      ...(year ? { year } : {}),
+      ...(timezone !== 'UTC' ? { timezone } : {}),
+    };
+    return http.get('/listening-patterns/listening-heatmap', { params, cacheTtlMs: 60000 });
   },
 
-  async getMonthlyTrends(year = null, timezone = 'UTC') {
-    const params = new URLSearchParams();
-    if (year) params.append('year', year);
-    if (timezone !== 'UTC') params.append('timezone', timezone);
-    
-    const url = `${API_BASE_URL}/listening-patterns/monthly-trends${params.toString() ? '?' + params.toString() : ''}`;
-    
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch monthly trends data');
-    }
-    return response.json();
+  getMonthlyTrends(year = null, timezone = 'UTC') {
+    const params = {
+      ...(year ? { year } : {}),
+      ...(timezone !== 'UTC' ? { timezone } : {}),
+    };
+    return http.get('/listening-patterns/monthly-trends', { params, cacheTtlMs: 60000 });
   },
 
-  async getSeasonalTrends(year = null, timezone = 'UTC') {
-    const params = new URLSearchParams();
-    if (year) params.append('year', year);
-    if (timezone !== 'UTC') params.append('timezone', timezone);
-    
-    const url = `${API_BASE_URL}/listening-patterns/seasonal-trends${params.toString() ? '?' + params.toString() : ''}`;
-    
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch seasonal trends data');
-    }
-    return response.json();
+  getSeasonalTrends(year = null, timezone = 'UTC') {
+    const params = {
+      ...(year ? { year } : {}),
+      ...(timezone !== 'UTC' ? { timezone } : {}),
+    };
+    return http.get('/listening-patterns/seasonal-trends', { params, cacheTtlMs: 60000 });
   },
 
-  async getSeasonalTopContent(season, year = null, includeImages = true) {
-    const params = new URLSearchParams();
-    params.append('season', season);
-    if (year) params.append('year', year);
-    if (includeImages) params.append('include_images', 'true');
-
-    const url = `${API_BASE_URL}/listening-patterns/seasonal-top-content?${params.toString()}`;
-
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch seasonal top content');
-    }
-    return response.json();
+  getSeasonalTopContent(season, year = null, includeImages = true) {
+    const params = { season, ...(year ? { year } : {}), ...(includeImages ? { include_images: true } : {}) };
+    return http.get('/listening-patterns/seasonal-top-content', { params, cacheTtlMs: 60000 });
   },
 };

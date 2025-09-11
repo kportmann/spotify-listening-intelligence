@@ -1,22 +1,20 @@
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+import { http } from './http/client';
 
 export const musicService = {
-  async getTopArtists(period = 'all_time', limit = 10, includeImages = false, refreshCache = false) {
-    const url = `${API_BASE_URL}/music/top/artists?period=${period}&limit=${limit}&include_images=${includeImages}&refresh_cache=${refreshCache}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch top artists');
-    }
-    return response.json();
+  getTopArtists(period = 'all_time', limit = 10, includeImages = false, refreshCache = false) {
+    return http.get('/music/top/artists', {
+      params: { period, limit, include_images: includeImages, refresh_cache: refreshCache },
+      cacheTtlMs: 60000,
+      bypassCache: refreshCache,
+    });
   },
 
-  async getTopTracks(period = 'all_time', limit = 10, includeImages = false, refreshCache = false) {
-    const url = `${API_BASE_URL}/music/top/tracks?period=${period}&limit=${limit}&include_images=${includeImages}&refresh_cache=${refreshCache}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch top tracks');
-    }
-    return response.json();
+  getTopTracks(period = 'all_time', limit = 10, includeImages = false, refreshCache = false) {
+    return http.get('/music/top/tracks', {
+      params: { period, limit, include_images: includeImages, refresh_cache: refreshCache },
+      cacheTtlMs: 60000,
+      bypassCache: refreshCache,
+    });
   },
 
   async getAllTopMusicContent(period = 'all_time', limit = 5, includeImages = true) {
@@ -25,29 +23,20 @@ export const musicService = {
       this.getTopTracks(period, limit, includeImages)
     ]);
 
-    return {
-      artists,
-      tracks
-    };
+    return { artists, tracks };
   },
 
-  async getTopArtistsWithImages(period = 'all_time', limit = 100, refreshCache = false) {
+  getTopArtistsWithImages(period = 'all_time', limit = 100, refreshCache = false) {
     return this.getTopArtists(period, limit, true, refreshCache);
   },
 
-  async getTopTracksWithImages(period = 'all_time', limit = 100, refreshCache = false) {
+  getTopTracksWithImages(period = 'all_time', limit = 100, refreshCache = false) {
     return this.getTopTracks(period, limit, true, refreshCache);
-  }
-  ,
-  async getImagesBatch({ artists = null, tracks = null } = {}) {
-    const response = await fetch(`${API_BASE_URL}/music/images/batch`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ artists, tracks })
+  },
+
+  getImagesBatch({ artists = null, tracks = null } = {}) {
+    return http.post('/music/images/batch', {
+      body: { artists, tracks },
     });
-    if (!response.ok) {
-      throw new Error('Failed to fetch images batch');
-    }
-    return response.json();
   }
 };

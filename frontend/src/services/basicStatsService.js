@@ -1,31 +1,16 @@
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+import { http } from './http/client';
 
 export const basicStatsService = {
-  async getStatsOverview(period = null) {
-    const url = period && period !== 'all_time' 
-      ? `${API_BASE_URL}/basicStats/stats/overview?year=${period}`
-      : `${API_BASE_URL}/basicStats/stats/overview`;
-    
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch stats overview');
-    }
-    return response.json();
+  getStatsOverview(period = null) {
+    const params = period && period !== 'all_time' ? { year: period } : undefined;
+    return http.get('/basicStats/stats/overview', { params, cacheTtlMs: 60000 });
   },
 
-  async getAvailableYears() {
-    const response = await fetch(`${API_BASE_URL}/basicStats/stats/available-years`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch available years');
-    }
-    return response.json();
+  getAvailableYears() {
+    return http.get('/basicStats/stats/available-years', { cacheTtlMs: 60000 });
   },
 
-  async getFirstPlay() {
-    const response = await fetch(`${API_BASE_URL}/basicStats/stats/first-play`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch first play');
-    }
-    return response.json();
+  getFirstPlay() {
+    return http.get('/basicStats/stats/first-play');
   },
 };
