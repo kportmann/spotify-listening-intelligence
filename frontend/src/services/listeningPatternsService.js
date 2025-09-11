@@ -29,4 +29,9 @@ export const listeningPatternsService = {
     const params = { season, ...(year ? { year } : {}), ...(includeImages ? { include_images: true } : {}) };
     return http.get('/listening-patterns/seasonal-top-content', { params, cacheTtlMs: 60000 });
   },
+
+  getGeography(year = null) {
+    const params = { ...(year ? { year } : {}) };
+    return http.get('/listening-patterns/geography', { params, cacheTtlMs: 60000 });
+  },
 };

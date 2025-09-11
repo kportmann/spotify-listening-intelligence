@@ -1,0 +1,44 @@
+.map-section .worldmap-container {
+  margin-top: 1rem;
+  background: #1f1f1f;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #2a2a2a;
+}
+
+.map-section .map-legend {
+  margin-top: 0.75rem;
+  color: #b3b3b3;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+.map-section .legend-dot {
+  width: 10px;
+  height: 10px;
+  background: #1DB954;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.listening-patterns-loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.1rem;
+  color: #b3b3b3;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: #b3b3b3;
+}
+
+.placeholder-content p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+
