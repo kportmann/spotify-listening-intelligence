@@ -1,115 +1,63 @@
-import { useState, useEffect } from 'react';
+import { useApi } from './common/useApi';
 import { musicService } from '../services/musicService';
 import { podcastService } from '../services/podcastService';
 
 export function useTopContent(period = 'all_time', limit = 5) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, loading, refreshing, error, refetch } = useApi(
+    async () => {
+      const [musicData, podcastData] = await Promise.all([
+        musicService.getAllTopMusicContent(period, limit),
+        podcastService.getAllTopPodcastContent(period, limit)
+      ]);
+      return { ...musicData, ...podcastData };
+    },
+    { params: [period, limit] }
+  );
 
-  useEffect(() => {
-    Promise.all([
-      musicService.getAllTopMusicContent(period, limit),
-      podcastService.getAllTopPodcastContent(period, limit)
-    ])
-      .then(([musicData, podcastData]) => {
-        setData({
-          ...musicData,
-          ...podcastData
-        });
-      })
-      .catch(setError)
-      .finally(() => setLoading(false));
-  }, [period, limit]);
-
-  return { data, loading, error };
+  return { data, loading, refreshing, error, refetch };
 }
 
 export function useTopArtists(period = 'all_time', limit = 10, includeImages = false, refreshCache = false) {
-  const [artists, setArtists] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, loading, refreshing, error, refetch } = useApi(
+    () => musicService.getTopArtists(period, limit, includeImages, refreshCache),
+    { params: [period, limit, includeImages, refreshCache] }
+  );
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    musicService
-      .getTopArtists(period, limit, includeImages, refreshCache)
-      .then((data) => {
-        if (!cancelled) setArtists(data || []);
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [period, limit, includeImages, refreshCache]);
-
-  return { artists, loading, error };
+  return { artists: data || [], loading, refreshing, error, refetch };
 }
 
 export function useTopTracks(period = 'all_time', limit = 10) {
-  const [tracks, setTracks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, loading, refreshing, error, refetch } = useApi(
+    () => musicService.getTopTracks(period, limit),
+    { params: [period, limit] }
+  );
 
-  useEffect(() => {
-    musicService.getTopTracks(period, limit)
-      .then(setTracks)
-      .catch(setError)
-      .finally(() => setLoading(false));
-  }, [period, limit]);
-
-  return { tracks, loading, error };
+  return { tracks: data || [], loading, refreshing, error, refetch };
 }
 
 export function useTopEpisodes(period = 'all_time', limit = 10) {
-  const [episodes, setEpisodes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, loading, refreshing, error, refetch } = useApi(
+    () => podcastService.getTopEpisodes(period, limit, true),
+    { params: [period, limit] }
+  );
 
-  useEffect(() => {
-    podcastService.getTopEpisodes(period, limit, true)
-      .then(setEpisodes)
-      .catch(setError)
-      .finally(() => setLoading(false));
-  }, [period, limit]);
-
-  return { episodes, loading, error };
+  return { episodes: data || [], loading, refreshing, error, refetch };
 }
 
 export function useTopShows(period = 'all_time', limit = 10) {
-  const [shows, setShows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, loading, refreshing, error, refetch } = useApi(
+    () => podcastService.getTopShows(period, limit, true),
+    { params: [period, limit] }
+  );
 
-  useEffect(() => {
-    podcastService.getTopShows(period, limit, true)
-      .then(setShows)
-      .catch(setError)
-      .finally(() => setLoading(false));
-  }, [period, limit]);
-
-  return { shows, loading, error };
+  return { shows: data || [], loading, refreshing, error, refetch };
 }
 
 export function useTopAudiobooks(period = 'all_time', limit = 10) {
-  const [audiobooks, setAudiobooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, loading, refreshing, error, refetch } = useApi(
+    () => podcastService.getTopAudiobooks(period, limit),
+    { params: [period, limit] }
+  );
 
-  useEffect(() => {
-    podcastService.getTopAudiobooks(period, limit)
-      .then(setAudiobooks)
-      .catch(setError)
-      .finally(() => setLoading(false));
-  }, [period, limit]);
-
-  return { audiobooks, loading, error };
+  return { audiobooks: data || [], loading, refreshing, error, refetch };
 }

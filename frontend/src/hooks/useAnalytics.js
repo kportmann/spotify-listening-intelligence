@@ -1,20 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useApi } from './common/useApi';
 import { basicStatsService } from '../services/basicStatsService';
 
 export function useAnalytics(period = 'all_time') {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, loading, refreshing, error, refetch } = useApi(
+    () => basicStatsService.getStatsOverview(period),
+    { params: [period] }
+  );
 
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    
-    basicStatsService.getStatsOverview(period)
-      .then(setStats)
-      .catch(setError)
-      .finally(() => setLoading(false));
-  }, [period]);
-
-  return { stats, loading, error };
+  return { stats: data, loading, refreshing, error, refetch };
 }
