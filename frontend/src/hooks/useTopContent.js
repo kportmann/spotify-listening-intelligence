@@ -26,10 +26,10 @@ export function useTopArtists(period = 'all_time', limit = 10, includeImages = f
   return { artists: data || [], loading, refreshing, error, refetch };
 }
 
-export function useTopTracks(period = 'all_time', limit = 10) {
+export function useTopTracks(period = 'all_time', limit = 10, includeImages = false, refreshCache = false) {
   const { data, loading, refreshing, error, refetch } = useApi(
-    () => musicService.getTopTracks(period, limit),
-    { params: [period, limit] }
+    () => musicService.getTopTracks(period, limit, includeImages, refreshCache),
+    { params: [period, limit, includeImages, refreshCache] }
   );
 
   return { tracks: data || [], loading, refreshing, error, refetch };

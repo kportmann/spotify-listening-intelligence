@@ -1,59 +1,33 @@
-import { useState, useEffect } from 'react';
-import { musicService } from '../../services/musicService';
+import { useState, useMemo } from 'react';
+import { useTopTracks } from '../../hooks';
 import TopContentCarousel from './TopContentCarousel';
 import ExpandableTopList from './ExpandableTopList';
 import ExpandButton from '../common/ExpandButton/ExpandButton';
 import './TopTracks.css';
 
 export default function TopTracks({ period = 'all_time', limit = 100 }) {
-  const [tracks, setTracks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [showExpanded, setShowExpanded] = useState(false);
+  const [retryOnce, setRetryOnce] = useState(false);
 
-  // Load tracks with images included
-  useEffect(() => {
-    const loadTracksWithImages = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        const tracksData = await musicService.getTopTracksWithImages(period, limit);
-        
-        // Auto-retry with cache refresh if success rate is too low
-        const totalTracks = tracksData.length;
-        const tracksWithImages = tracksData.filter(track => track.image_url).length;
-        const successRate = (tracksWithImages / totalTracks) * 100;
-        
-        if (successRate < 60 && !loadTracksWithImages._retried) {
-          loadTracksWithImages._retried = true;
-          
-          try {
-            const retryData = await musicService.getTopTracksWithImages(period, limit, true);
-            setTracks(retryData);
-            return;
-          } catch (retryError) {
-            console.error('Retry failed:', retryError);
-          }
-        }
-        
-        setTracks(tracksData);
-      } catch (err) {
-        console.error('Failed to load tracks with images:', err);
-        setError(err);
-      } finally {
-        setLoading(false);
+  const { tracks, loading, refreshing, error, refetch } = useTopTracks(period, limit, true, retryOnce);
+
+  // Compute success rate and trigger one-time retry with cache refresh if low
+  useMemo(() => {
+    if (!loading && !refreshing && !error && tracks?.length) {
+      const total = tracks.length;
+      const withImages = tracks.filter(t => t.image_url).length;
+      const successRate = (withImages / total) * 100;
+      if (successRate < 60 && !retryOnce) {
+        setRetryOnce(true);
+        refetch();
       }
-    };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, refreshing, error, tracks]);
 
-    loadTracksWithImages();
-  }, [period, limit]);
+  const toggleExpanded = () => setShowExpanded(!showExpanded);
 
-  const toggleExpanded = () => {
-    setShowExpanded(!showExpanded);
-  };
-
-  if (loading) {
+  if (loading && !tracks.length) {
     return (
       <div className="top-tracks-section">
         <div className="top-tracks-loading">Loading your top tracks...</div>
@@ -78,11 +52,10 @@ export default function TopTracks({ period = 'all_time', limit = 100 }) {
             type="tracks"
             title="Top Tracks"
           />
-          
           <ExpandButton 
             isExpanded={false}
             onClick={toggleExpanded}
-            isLoading={false}
+            isLoading={refreshing}
           />
         </>
       ) : (
@@ -91,9 +64,8 @@ export default function TopTracks({ period = 'all_time', limit = 100 }) {
             items={tracks}
             type="tracks"
             title="All Top Tracks"
-            loadingImages={false}
+            loadingImages={refreshing}
           />
-          
           <ExpandButton 
             isExpanded={true}
             onClick={toggleExpanded}

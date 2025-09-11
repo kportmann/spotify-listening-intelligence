@@ -87,7 +87,7 @@ export default function TopContentCarousel({ items, type, title }) {
               <h4 className="carousel-primary-text">{item.track_name}</h4>
               {isMain && (
                 <p className="carousel-secondary-text">
-                  {item.artist_name} • {item.total_hours}h
+                  {item.artist_name} • {item.total_hours}h • {item.play_count} plays
                 </p>
               )}
             </div>

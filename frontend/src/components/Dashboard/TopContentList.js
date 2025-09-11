@@ -65,7 +65,7 @@ export default function TopContentList({
             )}
             <div className="content-info">
               <div className="primary-text">{item.track_name}</div>
-              <div className="secondary-text">{item.artist_name} • {item.total_hours}h</div>
+              <div className="secondary-text">{item.artist_name} • {item.total_hours}h • {item.play_count} plays</div>
             </div>
           </div>
         );
