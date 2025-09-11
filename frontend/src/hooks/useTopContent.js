@@ -25,17 +25,31 @@ export function useTopContent(period = 'all_time', limit = 5) {
   return { data, loading, error };
 }
 
-export function useTopArtists(period = 'all_time', limit = 10) {
+export function useTopArtists(period = 'all_time', limit = 10, includeImages = false, refreshCache = false) {
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    musicService.getTopArtists(period, limit)
-      .then(setArtists)
-      .catch(setError)
-      .finally(() => setLoading(false));
-  }, [period, limit]);
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    musicService
+      .getTopArtists(period, limit, includeImages, refreshCache)
+      .then((data) => {
+        if (!cancelled) setArtists(data || []);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [period, limit, includeImages, refreshCache]);
 
   return { artists, loading, error };
 }

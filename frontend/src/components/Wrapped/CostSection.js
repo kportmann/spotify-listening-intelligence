@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import './CostSection.css';
-import { basicStatsService } from '../../services/basicStatsService';
+import { useAnalytics } from '../../hooks/useAnalytics';
 
 function calculateInclusiveMonthSpan(startDate, endDate) {
   if (!startDate || !endDate) return 0;
@@ -11,32 +11,12 @@ function calculateInclusiveMonthSpan(startDate, endDate) {
 }
 
 export default function CostSection() {
-  const [firstDate, setFirstDate] = useState(null);
-  const [lastDate, setLastDate] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const fetchOverview = async () => {
-      try {
-        setError(null);
-        const overview = await basicStatsService.getStatsOverview();
-        if (!cancelled) {
-          const fs = overview?.time_period?.first_stream ? new Date(overview.time_period.first_stream) : null;
-          const ls = overview?.time_period?.last_stream ? new Date(overview.time_period.last_stream) : null;
-          setFirstDate(fs);
-          setLastDate(ls);
-        }
-      } catch (e) {
-        if (!cancelled) setError('Failed to load overview');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    fetchOverview();
-    return () => { cancelled = true; };
-  }, []);
+  const { stats, loading, error } = useAnalytics('all_time');
+  const { firstDate, lastDate } = useMemo(() => {
+    const fs = stats?.time_period?.first_stream ? new Date(stats.time_period.first_stream) : null;
+    const ls = stats?.time_period?.last_stream ? new Date(stats.time_period.last_stream) : null;
+    return { firstDate: fs, lastDate: ls };
+  }, [stats]);
 
   const months = firstDate && lastDate ? calculateInclusiveMonthSpan(firstDate, lastDate) : 0;
   const monthlyPrice = 14; // CHF per month

@@ -1,39 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import './FirstPlaySection.css';
-import { basicStatsService } from '../../services/basicStatsService';
-import { musicService } from '../../services/musicService';
+import { useFirstPlay } from '../../hooks/useFirstPlay';
 
 export default function FirstPlaySection() {
-  const [firstPlay, setFirstPlay] = useState(null);
-  const [images, setImages] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { firstPlay, images, loading } = useFirstPlay();
 
-  useEffect(() => {
-    let cancelled = false;
-    const fetchFirstPlay = async () => {
-      try {
-        const data = await basicStatsService.getFirstPlay();
-        if (!cancelled) {
-          setFirstPlay(data);
-          if (data && data.artist_name && data.track_name) {
-            const batch = await musicService.getImagesBatch({
-              artists: [data.artist_name],
-              tracks: [{ track_name: data.track_name, artist_name: data.artist_name }]
-            });
-            if (!cancelled) setImages(batch);
-          }
-        }
-      } catch (e) {
-        if (!cancelled) setFirstPlay(null);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    fetchFirstPlay();
-    return () => { cancelled = true; };
-  }, []);
-
-  const firstDate = firstPlay?.played_at ? new Date(firstPlay.played_at) : null;
+  const firstDate = useMemo(() => (firstPlay?.played_at ? new Date(firstPlay.played_at) : null), [firstPlay]);
   const firstDateFmt = firstDate ? firstDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : null;
 
   return (
