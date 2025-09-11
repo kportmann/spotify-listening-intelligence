@@ -4,20 +4,16 @@
   margin: 0 auto;
 }
 
-.patterns-content {
+.dv-patterns-content {
   display: grid;
   gap: 2rem;
-  background: #181818;
   border-radius: 16px;
   padding: 2rem;
 }
 
-.pattern-section {
-  background: #282828;
+.dv-pattern-section {
   border-radius: 16px;
   padding: 2rem;
-  border: 1px solid #181818;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
 /* Responsive design */
