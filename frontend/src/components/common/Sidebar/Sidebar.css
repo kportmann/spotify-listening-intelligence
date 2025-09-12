@@ -18,8 +18,8 @@
 .sidebar-toggle {
   display: none;
   position: fixed;
-  top: 90px;
-  left: 16px;
+  top: 72px;
+  left: 12px;
   z-index: 1001;
   background-color: #1db954;
   color: white;

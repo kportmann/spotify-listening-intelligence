@@ -1,5 +1,14 @@
 # Spotify Listening Intelligence
 
+> Note: This project is under active development and new features are planed.
+
+## Demo Video
+
+Here is a quick Demovideo of the current state (09/12/2025). Hope you like it:
+
+[![Watch the demo](Demo/Thumbnail.png)](Demo/DemoVideo.mp4)
+
+
 ## Setup Instructions
 
 ### 1. Get Your Spotify Data
@@ -35,8 +44,8 @@ docker compose up -d
    - Host: `spotify-listening-intelligence-db`
    - Port: `5432`
    - Database: `spotify_listening_intelligence`
-   - Username: `spotify_user`
-   - Password: `spotify_password`
+   - Username: `your_user_name`
+   - Password: `your_password`
 
 ### 6. Populate Database
 ```bash

@@ -13,7 +13,7 @@ function Header() {
           <div className="user-avatar">
             <span>K</span>
           </div>
-          <span className="user-name">user</span>
+          <span className="user-name">User</span>
         </div>
       </div>
     </header>
