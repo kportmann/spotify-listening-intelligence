@@ -4,9 +4,9 @@
 
 ## Demo Video
 
-Here is a quick Demovideo of the current state (09/12/2025). Hope you like it:
+Here is a quick Demo of the current state (09/12/2025). Hope you like it:
 
-[![Watch the demo](Demo/Thumbnail.png)](Demo/DemoVideo.mp4)
+![Watch the demo](Demo/DemoVideo.gif)
 
 
 ## Setup Instructions
