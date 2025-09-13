@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from config.settings import get_settings
-from routers import basicAnalytics, musicAnalytics, podcastAnalytics, listeningPatternsAnalytics
+from routers import basicAnalytics, musicAnalytics, podcastAnalytics, listeningPatternsAnalytics, discoveryAndVarietyAnalytics
 from datetime import datetime, timezone
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -67,6 +67,7 @@ app.include_router(basicAnalytics.router, prefix="/api/v1/basicStats", tags=["ba
 app.include_router(musicAnalytics.router, prefix="/api/v1/music", tags=["music"])
 app.include_router(podcastAnalytics.router, prefix="/api/v1/podcasts", tags=["podcasts"])
 app.include_router(listeningPatternsAnalytics.router, prefix="/api/v1/listening-patterns", tags=["listening-patterns"])
+app.include_router(discoveryAndVarietyAnalytics.router, prefix="/api/v1/discovery-and-variety", tags=["discovery-and-variety"])
 
 @app.get("/")
 async def root():

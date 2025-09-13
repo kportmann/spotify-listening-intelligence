@@ -3,10 +3,10 @@ import './WorldListeningMap.css';
 import SectionTitle from '../common/SectionTitle/SectionTitle';
 import SectionDescription from '../common/SectionDescription/SectionDescription';
 import WorldMap from 'react-svg-worldmap';
-import { useListeningGeography } from '../../hooks/useListeningGeography';
+import { useWorldListeningMap } from '../../hooks/useDiscoveryAndVariety';
 
 export default function WorldListeningMap({ year = null }) {
-  const { data, loading, error } = useListeningGeography(year);
+  const { data, loading, error } = useWorldListeningMap(year);
 
   const worldmapData = useMemo(() => {
     if (!data || !data.countries) return [];
