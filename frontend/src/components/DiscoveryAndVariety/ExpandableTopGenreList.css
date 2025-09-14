@@ -1,0 +1,80 @@
+.expandable-list-container {
+  margin-top: 2rem;
+}
+
+.expandable-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.expandable-list-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.expandable-list-content {
+  background: #303030;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333333;
+}
+
+.expandable-list-loading,
+.expandable-list-error,
+.expandable-list-no-data {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #a1a1a1;
+  background: #303030;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333333;
+}
+
+.expandable-list-error {
+  color: #ef4444;
+}
+
+.gs-list {
+  margin: 0;
+}
+
+.gs-item {
+  background: transparent;
+}
+
+.gs-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #b3b3b3;
+  font-size: 12px;
+}
+
+.gs-dot {
+  opacity: 0.6;
+}
+
+.gs-pager {
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .expandable-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .expandable-list-content {
+    padding: 1rem;
+  }
+}
+
+

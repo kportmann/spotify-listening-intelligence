@@ -15,6 +15,8 @@ export default function RadarChart({
   levels = 5,
   maxValue,
   showPoints = true,
+  showLabels = false,
+  showLegend = true,
   className = '',
 }) {
   const cleaned = useMemo(() => (data || []).filter(d => d && typeof d.value === 'number' && d.label), [data]);
@@ -28,6 +30,19 @@ export default function RadarChart({
   const center = size / 2;
   const margin = 28; // room for labels
   const radius = center - margin;
+
+  // Modern, high-contrast palette suitable for dark backgrounds
+  const colorPalette = [
+    '#22D3EE', // cyan-400
+    '#F59E0B', // amber-500
+    '#A78BFA', // violet-400
+    '#10B981', // emerald-500
+    '#F472B6', // pink-400
+    '#60A5FA', // blue-400
+    '#F43F5E', // rose-500
+    '#84CC16', // lime-500
+  ];
+  const colors = colorPalette.slice(0, n);
 
   const angleForIndex = (i) => {
     // start at -90deg (top), go clockwise
@@ -80,6 +95,7 @@ export default function RadarChart({
   }, [n, cleaned]);
 
   const labels = useMemo(() => {
+    if (!showLabels) return [];
     const arr = [];
     const labelRadius = radius + 10;
     for (let i = 0; i < n; i += 1) {
@@ -92,7 +108,7 @@ export default function RadarChart({
       arr.push({ x, y, anchor, text: cleaned[i].label });
     }
     return arr;
-  }, [n, radius, center, cleaned]);
+  }, [n, radius, center, cleaned, showLabels]);
 
   return (
     <div className={`radar-chart ${className}`}>
@@ -121,20 +137,32 @@ export default function RadarChart({
           <g className="radar-points">
             {cleaned.map((d, i) => {
               const { x, y } = toXY(d.value, i);
-              return <circle key={d.label} cx={x} cy={y} r={3} />;
+              return <circle key={d.label} cx={x} cy={y} r={2} style={{ fill: colors[i] }} />;
             })}
           </g>
         )}
 
         {/* Labels */}
-        <g className="radar-labels">
-          {labels.map((l, idx) => (
-            <text key={idx} x={l.x} y={l.y} textAnchor={l.anchor} dominantBaseline="middle">
-              {l.text}
-            </text>
-          ))}
-        </g>
+        {showLabels && (
+          <g className="radar-labels">
+            {labels.map((l, idx) => (
+              <text key={idx} x={l.x} y={l.y} textAnchor={l.anchor} dominantBaseline="middle">
+                {l.text}
+              </text>
+            ))}
+          </g>
+        )}
       </svg>
+      {showLegend && n > 0 && (
+        <div className="radar-legend">
+          {cleaned.map((d, i) => (
+            <div key={d.label} className="radar-legend-item">
+              <span className="radar-legend-dot" style={{ backgroundColor: colors[i] }} />
+              <span className="radar-legend-label">{d.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

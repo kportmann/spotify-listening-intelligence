@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import './GerneStats.css';
+import './ExpandableTopGenreList.css';
 
 export default function ExpandableTopGenreList({ items = [], totalDistinct = null }) {
   const pageSize = 10;
@@ -20,22 +20,30 @@ export default function ExpandableTopGenreList({ items = [], totalDistinct = nul
         <h3 className="expandable-list-title">Top 40 of All Genres {typeof totalDistinct === 'number' ? ` (${totalDistinct})` : ''}</h3>
       </div>
 
-      <ul className="gs-list">
-        {displayItems.map((g) => (
-          <li key={g.genre} className="gs-item">
-            <div className="gs-row">
-              <div className="gs-genre">{g.genre}</div>
-              <div className="gs-share">{g.share_pct?.toFixed(1)}%</div>
-            </div>
-            <div className="gs-bar">
-              <div
-                className="gs-bar-fill"
-                style={{ width: `${Math.min(100, g.share_pct || 0)}%` }}
-              />
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="expandable-list-content">
+        <ul className="gs-list">
+          {displayItems.map((g) => (
+            <li key={g.genre} className="gs-item">
+              <div className="gs-row">
+                <div className="gs-genre">{g.genre}</div>
+                <div className="gs-meta">
+                  <span className="gs-share">{g.share_pct?.toFixed(1)}%</span>
+                  <span className="gs-dot">•</span>
+                  <span className="gs-mins">{new Intl.NumberFormat().format(g.total_minutes || Math.round((g.total_ms || 0) / 60000))} min</span>
+                  <span className="gs-dot">•</span>
+                  <span className="gs-count">{new Intl.NumberFormat().format(g.stream_count || 0)} plays</span>
+                </div>
+              </div>
+              <div className="gs-bar">
+                <div
+                  className="gs-bar-fill"
+                  style={{ width: `${Math.min(100, g.share_pct || 0)}%` }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {totalPages > 1 && (
         <div className="gs-pager" role="navigation" aria-label="Genres pages">

@@ -6,7 +6,6 @@ import './GerneStats.css';
 import RadarChart from './RadarChart';
 import ExpandButton from '../common/ExpandButton/ExpandButton';
 import ExpandableTopGenreList from './ExpandableTopGenreList';
-import InfoTooltip from '../common/InfoTooltip/InfoTooltip';
 
 export default function GerneStats({ year = null }) {
   const [weighting, setWeighting] = useState('even');
@@ -23,16 +22,7 @@ export default function GerneStats({ year = null }) {
 
   return (
     <section className="gs-section">
-      <div className="gs-header-row">
-        <SectionTitle title="Top Genres" />
-        <InfoTooltip>
-          <p>The spiderweb shows your top 6 genres by share of total listening. Together they account for <strong>{top6Coverage.toFixed(1)}%</strong> of your total. Each spoke’s length corresponds to the genre’s share.</p>
-          <ul>
-            <li><strong>Even weighting</strong>: an artist with multiple genres splits their time evenly across them.</li>
-            <li><strong>Full weighting</strong>: an artist’s full time counts for each of their listed genres.</li>
-          </ul>
-        </InfoTooltip>
-      </div>
+      <SectionTitle title="Top Genres" />
       <SectionDescription>
         Your top genres by listening time{year ? ` in ${year}` : ''}. Percentages are out of your total music listening time.
         {typeof totalDistinct === 'number' && (

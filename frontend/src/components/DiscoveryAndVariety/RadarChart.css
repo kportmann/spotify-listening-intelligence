@@ -1,7 +1,7 @@
 .radar-chart {
   width: 100%;
   max-width: 520px;
-  margin: 0 auto 16px auto;
+  margin: 0 auto 8px auto;
 }
 
 .radar-chart svg {
@@ -17,13 +17,13 @@
 
 .radar-axes line {
   stroke: #4a4a4a;
-  stroke-width: 1;
+  stroke-width: 0.6;
 }
 
 .radar-area {
-  fill: rgba(29, 185, 84, 0.35);
-  stroke: #1DB954;
-  stroke-width: 2;
+  fill: rgba(255, 255, 255, 0.279);
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 1.2;
 }
 
 .radar-points circle {
@@ -33,6 +33,32 @@
 .radar-labels text {
   fill: #e5e5e5;
   font-size: 5px;
+}
+
+
+.radar-legend {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(2, auto);
+  justify-content: center;
+  align-items: center;
+  gap: 6px 14px;
+  margin-top: 4px;
+}
+
+.radar-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #e5e5e5;
+  font-size: 12px;
+}
+
+.radar-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 
