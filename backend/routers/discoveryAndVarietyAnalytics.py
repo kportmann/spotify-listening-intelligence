@@ -71,6 +71,7 @@ class TopGernesResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     genres: List[GenreStat] = Field(..., description="Top genres by listening time")
     total_genres: int = Field(..., ge=0, description="Number of distinct genres")
+    total_distinct_genres: int = Field(..., ge=0, description="Total distinct genres in period")
 
 
 @router.get("/worldmap", response_model=GeoListeningResponse)
@@ -243,5 +244,6 @@ async def get_top_genres(
 
     return TopGernesResponse(
         genres=genres,
-        total_genres=len(genres)
+        total_genres=len(genres),
+        total_distinct_genres=len(genre_totals)
     )

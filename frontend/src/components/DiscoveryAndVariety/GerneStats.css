@@ -2,6 +2,44 @@
   margin-top: 24px;
 }
 
+.gs-header-row {
+  display: flex;
+  align-items: flex;
+  gap: 8px;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 32px;
+}
+
+/* Use a single underline for the whole header row */
+.gs-header-row::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  border-radius: 2px;
+}
+
+/* Hide the default underline from SectionTitle within this header row */
+.gs-header-row .section-title::after {
+  display: none;
+}
+
+/* Remove extra bottom margin from SectionTitle inside header row */
+.gs-header-row .section-title {
+  margin-bottom: 0;
+}
+
+.gs-section .section-description {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .gs-loading,
 .gs-error,
 .gs-empty {
@@ -83,6 +121,30 @@
 }
 
 .gs-toggle.active {
+  background: #1DB954;
+  border-color: #1DB954;
+  color: #0f0f0f;
+}
+
+.gs-pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.gs-page-btn {
+  color: #e5e5e5;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.gs-page-btn.active {
   background: #1DB954;
   border-color: #1DB954;
   color: #0f0f0f;
