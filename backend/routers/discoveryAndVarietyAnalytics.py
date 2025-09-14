@@ -60,6 +60,7 @@ class GenreStat(BaseModel):
     genre: str = Field(..., min_length=1)
     total_ms: int = Field(..., ge=0)
     stream_count: int = Field(..., ge=0)
+    share_pct: float = Field(..., ge=0, le=100)
     
     @computed_field
     @property
@@ -134,6 +135,7 @@ async def get_listening_worldmap(
 async def get_top_genres(
     year: Optional[int] = None,
     limit: int = 50,
+    weighting: str = "even",
     db: Session = Depends(get_db)
 ) -> TopGernesResponse:
     """Get top genres by listening time, optionally filtered by year."""
@@ -143,6 +145,8 @@ async def get_top_genres(
         _ = ListeningAnalyticsQuery(year=year)
         if limit < 1 or limit > 500:
             raise ValueError("limit must be between 1 and 500")
+        if weighting not in {"even", "full"}:
+            raise ValueError("weighting must be 'even' or 'full'")
     except (ValidationError, ValueError) as e:
         raise HTTPException(status_code=422, detail=str(e))
 
@@ -156,7 +160,8 @@ async def get_top_genres(
     ).join(
         Artist, Track.artist_spotify_id == Artist.spotify_id
     ).filter(
-        SpotifyStream.spotify_track_uri.isnot(None)
+        SpotifyStream.spotify_track_uri.isnot(None),
+        SpotifyStream.ms_played >= 5000
     )
 
     if year is not None:
@@ -204,7 +209,7 @@ async def get_top_genres(
         if not unique_genres:
             continue
 
-        weight = 1.0 / len(unique_genres)
+        weight = 1.0 / len(unique_genres) if weighting == "even" else 1.0
         total_ms = int(row.total_ms or 0)
         stream_count = int(row.stream_count or 0)
 
@@ -217,11 +222,21 @@ async def get_top_genres(
     # Sort by total_ms and limit
     sorted_items = sorted(genre_totals.items(), key=lambda kv: kv[1]['total_ms'], reverse=True)[:limit]
 
+    # Denominator: total streamed music time for the selected period (all tracks with Spotify URI)
+    total_ms_all_query = db.query(func.sum(SpotifyStream.ms_played)).filter(
+        SpotifyStream.spotify_track_uri.isnot(None),
+        SpotifyStream.ms_played >= 5000
+    )
+    if year is not None:
+        total_ms_all_query = total_ms_all_query.filter(extract('year', SpotifyStream.ts) == year)
+    total_ms_all = int(total_ms_all_query.scalar() or 0) or 1
+
     genres = [
         GenreStat(
             genre=genre,
             total_ms=stats['total_ms'],
-            stream_count=stats['stream_count']
+            stream_count=stats['stream_count'],
+            share_pct=round((stats['total_ms'] * 100.0) / total_ms_all, 2)
         )
         for genre, stats in sorted_items
     ]
