@@ -3,6 +3,7 @@ import './DiscoveryAndVariety.css';
 import PageHeader from '../common/PageHeader/PageHeader';
 import TimePeriodSelector from '../common/TimePeriodSelector/TimePeriodSelector';
 import WorldListeningMap from './WorldListeningMap';
+import GerneStats from './GerneStats';
 
 
 export default function DiscoveryAndVariety() {
@@ -26,6 +27,11 @@ export default function DiscoveryAndVariety() {
       <div className="patterns-content">
         <WorldListeningMap year={selectedYear} />
       </div>
+
+      <div className="patterns-content">
+        <GerneStats year={selectedYear} />
+      </div>
+
     </div>
   );
 }

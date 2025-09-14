@@ -9,3 +9,4 @@ export {
   useTopAudiobooks,
 } from './useTopContent';
 export { useWorldListeningMap } from './useDiscoveryAndVariety';
+export { useTopGenres } from './useDiscoveryAndVariety';
