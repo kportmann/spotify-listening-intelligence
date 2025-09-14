@@ -8,4 +8,4 @@ export {
   useTopShows,
   useTopAudiobooks,
 } from './useTopContent';
-export { useListeningGeography } from './useListeningGeography';
+export { useWorldListeningMap } from './useDiscoveryAndVariety';

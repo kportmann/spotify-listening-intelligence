@@ -55,8 +55,8 @@ class GeoListeningResponse(BaseModel):
 
 
 
-@router.get("/geography", response_model=GeoListeningResponse)
-async def get_listening_geography(
+@router.get("/worldmap", response_model=GeoListeningResponse)
+async def get_listening_worldmap(
     year: Optional[int] = None,
     db: Session = Depends(get_db)
 ) -> GeoListeningResponse:
