@@ -1,0 +1,38 @@
+.radar-chart {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto 16px auto;
+}
+
+.radar-chart svg {
+  width: 100%;
+  height: auto;
+}
+
+.radar-grid polygon {
+  fill: none;
+  stroke: #3a3a3a;
+  stroke-width: 1;
+}
+
+.radar-axes line {
+  stroke: #4a4a4a;
+  stroke-width: 1;
+}
+
+.radar-area {
+  fill: rgba(29, 185, 84, 0.35);
+  stroke: #1DB954;
+  stroke-width: 2;
+}
+
+.radar-points circle {
+  fill: #1DB954;
+}
+
+.radar-labels text {
+  fill: #e5e5e5;
+  font-size: 12px;
+}
+
+
