@@ -25,7 +25,7 @@ Here is a quick Demo of the current state (09/12/2025). Hope you like it:
 
 - Frontend: React 19, React Router 7
 - Backend: FastAPI (Python 3.10+), Pydantic v2, SQLAlchemy 2
-- Database: PostgreSQL
+- Database: PostgreSQL 17:alpine
 - HTTP: Uvicorn, httpx
 - Containerization: Docker
 
@@ -72,9 +72,10 @@ docker compose up -d
 # Populate database with your streaming data
 docker compose exec backend python scripts/populate_db.py
 
-# Enrich with Spotify artist data (genres, metadata) via Spotify API
+# Enrich with Spotify artist data (id, genres, metadata) via Spotify API
 docker compose exec backend python scripts/populate_artists.py
 ```
+This will take a while, since it need to fetch artist ids by single API calls from Spotify without exceeding limits.
 
 ### Expected Data Format
 Your `data/` folder should contain files like:
